@@ -13,7 +13,6 @@ funding_rate_app/
 ├── app.py
 ├── requirements.txt
 ├── config.py
-├── .env
 ├── static/
 │   ├── css/
 │       └── styles.css
@@ -36,7 +35,6 @@ funding_rate_app/
 - `app.py`: The main application file where the Flask app is set up, routes are defined, and the server is run.
 - `requirements.txt`: A file listing all the dependencies required for the project.
 - `config.py`: Configuration file for setting up different configurations for the app, such as development, testing, and production.
-- `.env`: Environment file where sensitive information like API keys, secret keys, and configuration variables are stored.
 - `static/`: Directory for static files like CSS, JavaScript, and images.
   - `css/`: Contains CSS files for styling.
     - `styles.css`: Main stylesheet for the application.
@@ -46,17 +44,11 @@ funding_rate_app/
   - `index.html`: Main page template displaying funding rates.
   - `login.html`: Login page template.
 - `services/`: Directory for service modules that handle API interactions.
-  - `__init__.py`: Initialization file for the services package.
-  - `hyperliquid_service.py`: Functions to interact with the HyperLiquid API.
-  - `aevo_service.py`: Functions to interact with the AEVO API.
-  - `bybit_service.py`: Functions to interact with the Bybit API.
-  - `gateio_service.py`: Functions to interact with the Gate.io API.
+  - `service.py`: API File.
 - `tests/`: Directory for unit tests and integration tests.
   - `__init__.py`: Initialization file for the tests package.
   - `test_app.py`: Tests for the main app functionalities.
   - `test_services.py`: Tests for the service modules.
-- `instance/`: Directory for instance-specific configurations.
-  - `config.py`: Configuration specific to this instance of the app, such as API keys and secret keys.
 
 ## Setup and Installation
 
