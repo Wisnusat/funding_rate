@@ -23,17 +23,12 @@ funding_rate_app/
 │   ├── index.html
 │   └── login.html
 ├── services/
-│   ├── __init__.py
-│   ├── hyperliquid_service.py
-│   ├── aevo_service.py
-│   ├── bybit_service.py
-│   └── gateio_service.py
-├── tests/
-│   ├── __init__.py
-│   ├── test_app.py
-│   └── test_services.py
-└── instance/
-    └── config.py
+│   └── service.py
+└── tests/
+    ├── __init__.py
+    ├── test_app.py
+    └── test_services.py
+
 ```
 
 ### Files and Directories
