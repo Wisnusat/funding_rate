@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Montserrat:wght@400;500;600&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
+    <div class="sidebar">
+        <div class="logo">
+            <img src="/assets/image/logo.png" width="52px" height="52px" />
+            <div class="logo-name">Xxx</div>
+        </div>
+        <div class="overview">Overview</div>
+        <ul class="menu">
+            <li class="menu-item active"><a href="#"><img class="icon-menu" src="/assets/icon/dashboard.png"
+                        width="24px" height="24px" />Dashboard</a></li>
+            <li class="menu-item logout"><a href="#"><img class="icon-menu" src="/assets/icon/logout.png" width="24px"
+                        height="24px" />Logout </a></li>
+        </ul>
+    </div>
+    <div class="vertical-line"></div>
+    <div class="main-content">
+        <header class="header">
+            <div class="title">
+                <h1>Dashboard</h1>
+                <p>Welcome Back <span>Soroushnrz!</span></p>
+            </div>
+            <div class="search-bar">
+                <input type="text" placeholder="Search Any coin">
+            </div>
+        </header>
+        <div class="filter">
+            <div class="button-container">
+                <button class="refresh-button">Refresh</button>
+            </div>
+            <div class="time-filters">
+                <button class="time-filter">1H</button>
+                <button class="time-filter">1D</button>
+                <button class="time-filter">7D</button>
+                <button class="time-filter">1M</button>
+                <button class="time-filter active">1Y</button>
+            </div>
+        </div>
+        <main class="content">
+            <table>
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Coin</th>
+                        <th>
+                            <div class="column">Average<img src="/assets/icon/ascdesc.png" width="8" height="16" />
+                            </div>
+                        </th>
+                        <th>
+                            <div class="column"><img src="/assets/icon/hyperliquid.png" width="24"
+                                    height="24" />HYPERLiquid<img src="/assets/icon/ascdesc.png" width="8"
+                                    height="16" /></div>
+                        </th>
+                        <th>
+                            <div class="column"><img src="/assets/icon/aevo.png" width="24" height="24" />AEVO<img
+                                    src="/assets/icon/ascdesc.png" width="8" height="16" /></div>
+                        </th>
+                        <th>
+                            <div class="column"><img src="/assets/icon/bybit.png" width="24" height="24" />BYBIT<img
+                                    src="/assets/icon/ascdesc.png" width="8" height="16" /></div>
+                        </th>
+                        <th>
+                            <div class="column"><img src="/assets/icon/gateio.png" width="24" height="24" />GATEio<img
+                                    src="/assets/icon/ascdesc.png" width="8" height="16" /></div>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody id="coinTableBody">
+                    <!-- Data will be inserted here by JavaScript -->
+                </tbody>
+            </table>
+        </main>
+        <footer class="footer">
+            <p>Current UTC Time: 06:51</p>
+        </footer>
+    </div>
+    <script src="/static/js/script.js"></script>
+</body>
+
+</html>
