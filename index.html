@@ -22,7 +22,7 @@
             <li class="menu-item active"><a href="#"><img class="icon-menu" src="/assets/icon/dashboard.png"
                         width="24px" height="24px" />Dashboard</a></li>
             <li class="menu-item logout"><a href="#"><img class="icon-menu" src="/assets/icon/logout.png" width="24px"
-                        height="24px" />Logout </a></li>
+                        height="24px" />Logout</a></li>
         </ul>
     </div>
     <div class="vertical-line"></div>
@@ -36,6 +36,39 @@
                 <input type="text" placeholder="Search Any coin">
             </div>
         </header>
+        <div class="header-mobile">
+            <div class="left-side">
+                <div class="title">
+                    <h1>Dashboard</h1>
+                    <p>Welcome Back <span>Soroushnrz!</span></p>
+                </div>
+                <div class="search-bar">
+                    <input type="text" placeholder="Search Any coin">
+                </div>
+            </div>
+            <img src="/assets/icon/hamburger.png" width="28" height="28" id="hamburger-menu" />
+        </div>
+        <!-- Drawer -->
+        <div id="drawer" class="drawer">
+            <div class="drawer-content">
+                <div class="close-drawer">
+                    <img src="/assets/icon/close.png" width="28" height="28" id="close-drawer" />
+                </div>
+                <div class="logo">
+                    <img src="/assets/image/logo.png" width="52px" height="52px" />
+                    <div class="logo-name">Xxx</div>
+                </div>
+                <div class="overview">Overview</div>
+                <ul class="menu">
+                    <li class="menu-item active"><a href="#"><img class="icon-menu" src="/assets/icon/dashboard.png"
+                                width="24px" height="24px" />Dashboard</a></li>
+                    <li class="menu-item logout"><a href="#"><img class="icon-menu" src="/assets/icon/logout.png"
+                                width="24px" height="24px" />Logout</a></li>
+                </ul>
+            </div>
+        </div>
+        <!-- Overlay -->
+        <div id="overlay" class="overlay"></div>
         <div class="filter">
             <div class="button-container">
                 <button class="refresh-button">Refresh</button>
@@ -48,39 +81,41 @@
                 <button class="time-filter active">1Y</button>
             </div>
         </div>
-        <main class="content">
-            <table>
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Coin</th>
-                        <th>
-                            <div class="column">Average<img src="/assets/icon/ascdesc.png" width="8" height="16" />
-                            </div>
-                        </th>
-                        <th>
-                            <div class="column"><img src="/assets/icon/hyperliquid.png" width="24"
-                                    height="24" />HYPERLiquid<img src="/assets/icon/ascdesc.png" width="8"
-                                    height="16" /></div>
-                        </th>
-                        <th>
-                            <div class="column"><img src="/assets/icon/aevo.png" width="24" height="24" />AEVO<img
-                                    src="/assets/icon/ascdesc.png" width="8" height="16" /></div>
-                        </th>
-                        <th>
-                            <div class="column"><img src="/assets/icon/bybit.png" width="24" height="24" />BYBIT<img
-                                    src="/assets/icon/ascdesc.png" width="8" height="16" /></div>
-                        </th>
-                        <th>
-                            <div class="column"><img src="/assets/icon/gateio.png" width="24" height="24" />GATEio<img
-                                    src="/assets/icon/ascdesc.png" width="8" height="16" /></div>
-                        </th>
-                    </tr>
-                </thead>
-                <tbody id="coinTableBody">
-                    <!-- Data will be inserted here by JavaScript -->
-                </tbody>
-            </table>
+        <main>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th class="sticky-col">
+                                <div class="right-shadow">Coin</div>
+                            </th>
+                            <th>Average</th>
+                            <th>
+                                <div class="column"><img src="/assets/icon/hyperliquid.png" width="24"
+                                        height="24" />HYPERLiquid<img src="/assets/icon/ascdesc.png" width="8"
+                                        height="16" /></div>
+                            </th>
+                            <th>
+                                <div class="column"><img src="/assets/icon/aevo.png" width="24" height="24" />AEVO<img
+                                        src="/assets/icon/ascdesc.png" width="8" height="16" /></div>
+                            </th>
+                            <th>
+                                <div class="column"><img src="/assets/icon/bybit.png" width="24" height="24" />BYBIT<img
+                                        src="/assets/icon/ascdesc.png" width="8" height="16" /></div>
+                            </th>
+                            <th>
+                                <div class="column"><img src="/assets/icon/gateio.png" width="24"
+                                        height="24" />GATEio<img src="/assets/icon/ascdesc.png" width="8" height="16" />
+                                </div>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody id="coinTableBody">
+                        <!-- Data will be inserted here by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
         </main>
         <footer class="footer">
             <p>Current UTC Time: 06:51</p>
