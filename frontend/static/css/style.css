@@ -1,0 +1,496 @@
+body {
+    margin: 0;
+    font-family: 'Inter', sans-serif;
+    display: flex;
+    height: 100vh;
+    background-color: #f9f9f9;
+    overflow: hidden;
+    /* Prevents page scrolling */
+}
+
+.sidebar {
+    width: 230px;
+    padding: 32px;
+    font-family: 'Montserrat', sans-serif;
+    height: 100%;
+    overflow: auto;
+    /* Allows scrolling within the sidebar if needed */
+}
+
+.sidebar .logo {
+    margin-bottom: 30px;
+    display: flex;
+    align-items: center;
+}
+
+.logo-name {
+    font-size: 26px;
+    font-weight: normal;
+    color: #111111;
+    margin-left: 0.5rem;
+}
+
+.sidebar .menu {
+    list-style: none;
+    padding: 0;
+}
+
+.sidebar .menu-item {
+    margin-bottom: 20px;
+}
+
+.sidebar .menu-item a {
+    text-decoration: none;
+    color: #333;
+    font-size: 16px;
+    display: flex;
+    font-weight: normal;
+    align-items: center;
+    padding: 12px;
+    display: flex;
+    justify-content: center;
+    border-radius: 10px;
+}
+
+.sidebar .menu-item.active a {
+    background-color: #0096FF;
+    color: white;
+}
+
+.menu-item.active a:hover {
+    transition: all;
+    opacity: 80%;
+    transition-duration: 200ms;
+}
+
+.menu-item.logout a {
+    background-color: #F9F1F1;
+    color: #E45A5A;
+}
+
+.icon-menu {
+    margin-right: 0.5rem;
+}
+
+.overview {
+    font-size: 14px;
+    color: #000000;
+    font-weight: normal;
+    margin-bottom: 30px;
+}
+
+.vertical-line {
+    width: 2px;
+    height: 100vh;
+    background-color: #E1E1E1;
+}
+
+.main-content {
+    flex: 1;
+    padding: 32px;
+    overflow: auto;
+    /* Allows scrolling within the main content */
+}
+
+.header {
+    font-family: 'Montserrat', sans-serif;
+    margin-bottom: 25px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.header h1 {
+    margin: 0;
+    margin-bottom: 2px;
+    font-size: 34px;
+    font-weight: 500;
+    color: #111111;
+}
+
+.header p {
+    margin: 0;
+    color: #4D4D4D;
+    font-weight: normal;
+    font-size: 19px;
+}
+
+.header span {
+    color: #111111;
+    font-weight: 500;
+    font-size: 19px;
+}
+
+.content {
+    background-color: rgba(252, 252, 252, 0.1);
+    padding: 28px;
+    box-shadow: 0px 20px 50px rgba(0, 0, 0, 0.07);
+    border-radius: 20px;
+}
+
+.controls {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.search-bar {
+    position: relative;
+    display: inline-block;
+}
+
+.search-bar input {
+    padding: 10px 40px 10px 10px;
+    /* Adjust right padding for the icon */
+    border: 1px solid #E3E3E3;
+    border-radius: 10px;
+    background-color: transparent;
+    font-family: 'Montserrat', sans-serif;
+    background-image: url('/assets/icon/search.png');
+    background-size: 20px;
+    /* Adjust size as needed */
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    /* Adjust position as needed */
+    transition-duration: 100ms;
+}
+
+.search-bar input:focus {
+    border-color: #007bff;
+    outline: none;
+    /* Remove default outline */
+}
+
+.filter {
+    display: flex;
+    justify-content: end;
+    margin-bottom: 25px;
+    align-items: center;
+}
+
+.time-filters {
+    width: auto;
+    font-family: 'Inter', sans-serif;
+    display: flex;
+    background-color: transparent;
+    border-radius: 9px;
+    padding: 10px;
+    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.05);
+}
+
+.time-filter {
+    background-color: transparent;
+    border: none;
+    padding: 10px;
+    margin-right: 5px;
+    font-size: 13px;
+    color: black;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s;
+    border-radius: 8px;
+}
+
+.time-filter:last-child {
+    margin-right: 0;
+}
+
+.time-filter:hover {
+    background-color: #f0f0f0;
+}
+
+.time-filter.active {
+    background-color: #E1F0FF;
+}
+
+.button-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 30px;
+}
+
+.refresh-button {
+    font-family: 'Montserrat', sans-serif;
+    background-color: #E1F0FF;
+    color: #007bff;
+    border: none;
+    border-radius: 20px;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.refresh-button:hover {
+    background-color: #d0e7ff;
+}
+
+.table-container {
+    overflow-x: auto;
+    padding: 10px;
+    background-color: #FAFAFA;
+    box-shadow: 0px 20px 50px rgba(0, 0, 0, 0.07);
+    border-radius: 20px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: 'Inter', sans-serif;
+}
+
+table th,
+table td {
+    padding: 15px;
+    text-align: left;
+    font-weight: 600;
+    white-space: nowrap;
+    /* Prevent text from wrapping */
+    background-color: #FAFAFA;
+    /* Ensure transparency */
+}
+
+.sticky-col {
+    position: -webkit-sticky; /* For Safari */
+    position: sticky;
+    left: 0;
+    background: #FAFAFA;
+    z-index: 1;
+}
+
+.column {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+}
+
+.down {
+    color: red;
+}
+
+.up {
+    color: green;
+}
+
+.footer {
+    margin-top: 24px;
+    text-align: left;
+    color: black;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.coin-logo {
+    width: 24px;
+    height: 24px;
+    vertical-align: middle;
+    margin-right: 8px;
+}
+
+.badge {
+    color: #808A9D;
+}
+
+.chevron-icon {
+    width: 10px;
+    height: 6px;
+    vertical-align: middle;
+    margin-right: 4px;
+}
+
+/* Drawer styling */
+.drawer {
+    position: fixed;
+    top: 0;
+    right: -100%;
+    width: 300px;
+    height: 100%;
+    background-color: #fff;
+    box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
+    transition: right 0.3s ease;
+    z-index: 1001; /* Ensure it's above the overlay */
+}
+
+.drawer.open {
+    right: 0;
+}
+
+/* Overlay styling */
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease;
+    z-index: 1000; /* Ensure it's below the drawer */
+}
+
+.overlay.open {
+    opacity: 1;
+    visibility: visible;
+}
+
+.drawer-content {
+    padding: 20px;
+}
+
+.close-drawer {
+    display: flex;
+    justify-content: end;
+    margin-bottom: 8px;
+}
+
+.drawer .logo {
+    margin-bottom: 30px;
+    display: flex;
+    align-items: center;
+}
+
+.drawer .menu {
+    list-style: none;
+    padding: 0;
+}
+
+.drawer .menu-item {
+    margin-bottom: 20px;
+}
+
+.drawer .menu-item a {
+    text-decoration: none;
+    color: #333;
+    font-size: 16px;
+    display: flex;
+    font-weight: normal;
+    align-items: center;
+    padding: 12px;
+    display: flex;
+    justify-content: center;
+    border-radius: 10px;
+}
+
+.drawer .menu-item.active a {
+    background-color: #0096FF;
+    color: white;
+}
+
+.header-mobile {
+    display: none;
+}
+
+#close-drawer {
+    cursor: pointer;
+}
+
+#hamburger-menu {
+    cursor: pointer;
+}
+
+@media (max-width: 768px) {
+    .main-content {
+        padding: 18px;
+    }
+
+    .sidebar {
+        display: none;
+    }
+
+    .filter {
+        display: flex;
+        margin-bottom: 14px;
+        flex-direction: row-reverse;
+        justify-content: start;
+        gap: 18px;
+    }
+
+    .time-filters {
+        width: fit-content;
+        margin-top: 4px;
+    }
+
+    .button-container {
+        display: block;
+    }
+
+    .header {
+        display: none;
+    }
+
+    .header h1 {
+        font-size: 20px;
+    }
+
+    .header p {
+        font-size: 12px;
+    }
+
+    .header span {
+        font-size: 12px;
+    }
+
+    .search-bar {
+        margin-top: 8px;
+        width: 100%;
+    }
+
+    .refresh-button {
+        padding: 5px 10px;
+        font-size: 14px;
+    }
+
+    .time-filter {
+        padding: 7px;
+        font-size: 12px;
+    }
+
+    .footer {
+        font-size: 12px;
+    }
+
+    table td {
+        font-size: 12px;
+    }
+
+    .content {
+        padding: 10px;
+        max-width: 100%;
+        overflow-x: auto;
+    }
+
+    .table-container {
+        padding: 4px 0px 4px 0px;
+    }
+
+    .header-mobile {
+        display: flex;
+        justify-content: space-between;
+        align-items: start;
+    }
+
+    .header-mobile h1 {
+        margin: 0;
+        margin-bottom: 2px;
+    }
+
+    .header-mobile p {
+        margin: 0;
+    }
+
+    .header-mobile span {
+        margin: 0;
+    }
+
+    .header-mobile .title {
+        margin-bottom: 4px;
+    }
+
+    .header-mobile {
+        padding-top: 6px;
+        margin-bottom: 24px;
+    }
+}
