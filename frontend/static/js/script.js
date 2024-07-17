@@ -9,8 +9,8 @@ document.addEventListener('DOMContentLoaded', () => {
         { rank: 7, coin: "Polkadot DOT", logo: "https://cryptologos.cc/logos/polkadot-new-dot-logo.png", average: "-0.65%", hyperliquid: "-0.65%", aevo: "0.65%", bybit: "-0.65%", gateio: "0.65%" }
     ];
 
-    const chevronGreen = '/assets/icon/chevron-green.png';
-    const chevronRed = '/assets/icon/chevron-red.png';
+    const chevronGreen = '/frontend/assets/icon/chevron-green.png';
+    const chevronRed = '/frontend/assets/icon/chevron-red.png';
 
     const tableBody = document.getElementById('coinTableBody');
 
