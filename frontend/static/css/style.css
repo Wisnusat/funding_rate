@@ -251,6 +251,10 @@ table td {
     /* Ensure transparency */
 }
 
+table td {
+    cursor: pointer;
+}
+
 .sticky-col {
     position: -webkit-sticky; /* For Safari */
     position: sticky;

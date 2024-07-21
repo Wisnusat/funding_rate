@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crypto Dashboard</title>
+    <link rel="stylesheet" href="/frontend/static/css/detail.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Montserrat:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <a href="/frontend/index.html" class="back-button"><img src="/frontend/assets/icon/chevron-left.png" />Back</a>
+            <div class="crypto-info">
+                <img src="https://cryptologos.cc/logos/bitcoin-btc-logo.png" alt="Bitcoin Logo" class="crypto-logo">
+                <div class="crypto-details">
+                    <h1>Bitcoin <span class="badge">BTC</span></h1>
+                    <p class="price">$58,114.68</p>
+                    <span class="percentage"><img src="/frontend/assets/icon/chevron-green.png" /> 0.65%</span>
+                </div>
+            </div>
+        </div>
+        <div class="content-wrapper">
+            <div class="content">
+                <div class="chart-section" id="chart-section">
+                    <!-- Chart will be inserted here using javascript -->
+                </div>
+            </div>
+            <div class="details-section">
+                <h2>Detail</h2>
+                <ul>
+                    <li>Price <span>$53,066,292.26</span></li>
+                    <li>Market Cap <span class="down">-$6,827,829.90 <span class="percentage">▼ 11.40%</span></span></li>
+                    <li>Volume <span>$50,238,608.36 / $59,738,211.19</span></li>
+                    <li>Volume / Market Cap <span class="down">$117 <span class="percentage">▼ 15.34%</span></span></li>
+                    <li>Circulating Supply <span>62.00%</span></li>
+                    <li>Total Supply <span>$1,000,000</span></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <script src="/frontend/static/js/detail.js"></script>
+</body>
+</html>

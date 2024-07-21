@@ -1,24 +1,34 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
-    <style>
-        body { font-family: Arial, sans-serif; }
-        .container { width: 50%; margin: auto; text-align: center; }
-        .login-form { margin-top: 50px; }
-    </style>
+    <link rel="stylesheet" href="/frontend/static/css/login.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Montserrat:wght@400;500;600&display=swap"
+        rel="stylesheet">
 </head>
 <body>
     <div class="container">
-        <h1>Login</h1>
-        <div class="login-form">
-            <form method="POST">
-                <input type="text" name="username" placeholder="Username" required><br><br>
-                <input type="password" name="password" placeholder="Password" required><br><br>
-                <button type="submit">Login</button>
+        <div class="image-section">
+            <img src="/frontend/assets/image/login-illustration.png" alt="Crypto illustration">
+        </div>
+        <div class="login-section">
+            <h2>Welcome back! 👋</h2>
+            <h1>Login to your account</h1>
+            <form action="/api/login" method="POST">
+                <div class="input-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" placeholder="Please enter your email" required>
+                </div>
+                <div class="input-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" placeholder="Enter password" required>
+                </div>
+                <button type="submit" class="login-button">Login</button>
             </form>
+            <p>Not registered? <a href="/register">Create an account</a></p>
         </div>
     </div>
 </body>

@@ -24,7 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
             };
 
             return `
-                <tr>
+                <tr onclick="window.location.href='/frontend/detail.html?coin=${abbreviation}'" style="cursor:pointer;">
                     <td>${coin.rank}</td>
                     <td class="sticky-col">
                         <img src="${coin.logo}" alt="${coin.coin} logo" class="coin-logo"> 
