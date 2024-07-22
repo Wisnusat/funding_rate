@@ -17,7 +17,7 @@
         <div class="login-section">
             <h2>Welcome back! 👋</h2>
             <h1>Login to your account</h1>
-            <form action="/api/login" method="POST">
+            <form id="loginForm">
                 <div class="input-group">
                     <label for="email">Email</label>
                     <input type="email" id="email" name="email" placeholder="Please enter your email" required>
@@ -31,5 +31,11 @@
             <p>Not registered? <a href="/register">Create an account</a></p>
         </div>
     </div>
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', function(event) {
+            event.preventDefault(); // Prevent the default form submission
+            window.location.href = '/frontend/'; // Redirect to the desired URL
+        });
+    </script>
 </body>
 </html>
