@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,31 +11,33 @@
         href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Montserrat:wght@400;500;600&display=swap"
         rel="stylesheet">
 </head>
+
 <body>
     <div class="container">
         <div class="image-section">
             <img src="/frontend/assets/image/login-illustration.png" alt="Crypto illustration">
         </div>
         <div class="login-section">
-            <h2>Welcome back! 👋</h2>
-            <h1>Login to your account</h1>
+            <h2>Hello There! 👋</h2>
+            <h1>Create your account</h1>
             <form id="loginForm">
                 <div class="input-group">
                     <label for="email">Username</label>
-                    <input type="text" id="username" name="username" placeholder="Please enter your username" required>
+                    <input type="text" id="username" name="username" placeholder=" Please enter your username" required>
                 </div>
                 <div class="input-group">
                     <label for="password">Password</label>
                     <input type="password" id="password" name="password" placeholder="Enter password" required>
                 </div>
-                <button type="submit" class="login-button">Login</button>
+                <button type="submit" class="login-button">Register</button>
             </form>
-            <p>Not registered? <a href="/frontend/register.html">Create an account</a></p>
+            <p>Already have accoount? <a href="/frontend/login.html">Login here</a></p>
         </div>
     </div>
     <div id="notification" class="notification"></div>
+    <div id="notification-success" class="notification-success"></div>
     <script type="module">
-        import { login } from './config/apiService.js';
+        import { register } from './config/apiService.js';
 
         document.getElementById('loginForm').addEventListener('submit', async function(event) {
             event.preventDefault(); // Prevent the default form submission
@@ -42,13 +45,15 @@
             const username = document.getElementById('username').value;
             const password = document.getElementById('password').value;
             
-            const response = await login(username, password);
+            const response = await register(username, password);
             
-            if (response && response.token) {
-                document.cookie = `token=${response.token}; path=/`;
-                window.location.href = '/frontend/'; // Redirect to the desired URL
+            if (response && response.code == 200) {
+                showNotification(`Register Success, please login again`)
+                setTimeout(() => {
+                    window.location.href = '/frontend/login.html'; // Redirect to the desired URL
+                }, 1000)
             } else {
-                showErrorNotification('Login failed. Please check your credentials and try again.');
+                showErrorNotification(`Register Failed, ${response.message || 'Please try again'}`)
             }
         });
 
@@ -60,6 +65,16 @@
                 notification.classList.remove('show');
             }, 3000); // Hide after 3 seconds
         }
+
+        function showNotification(message) {
+            const notification = document.getElementById('notification-success');
+            notification.textContent = message;
+            notification.classList.add('show');
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000); // Hide after 3 seconds
+        }
     </script>
 </body>
+
 </html>

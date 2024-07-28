@@ -6,9 +6,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard</title>
     <link rel="stylesheet" href="/frontend/static/css/style.css">
+    <link rel="stylesheet" href="/frontend/static/css/global.css">
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Montserrat:wght@400;500;600&display=swap"
         rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/jwt-decode/build/jwt-decode.min.js"></script>
 </head>
 
 <body>
@@ -21,8 +23,8 @@
         <ul class="menu">
             <li class="menu-item active"><a href="#"><img class="icon-menu" src="/frontend/assets/icon/dashboard.png"
                         width="24px" height="24px" />Dashboard</a></li>
-            <li class="menu-item logout"><a href="/frontend/login.html"><img class="icon-menu" src="/frontend/assets/icon/logout.png" width="24px"
-                        height="24px" />Logout</a></li>
+            <li class="menu-item logout"><a id="logoutLink" href="/frontend/login.html"><img class="icon-menu"
+                        src="/frontend/assets/icon/logout.png" width="24px" height="24px" />Logout</a></li>
         </ul>
     </div>
     <div class="vertical-line"></div>
@@ -30,7 +32,7 @@
         <header class="header">
             <div class="title">
                 <h1>Dashboard</h1>
-                <p>Welcome Back <span>Soroushnrz!</span></p>
+                <p>Welcome Back <span id="usernameDisplay"></span></p>
             </div>
             <div class="search-bar">
                 <input type="text" placeholder="Search Any coin">
@@ -40,7 +42,7 @@
             <div class="left-side">
                 <div class="title">
                     <h1>Dashboard</h1>
-                    <p>Welcome Back <span>Soroushnrz!</span></p>
+                    <p>Welcome Back <span id="usernameDisplay"></span></p>
                 </div>
                 <div class="search-bar">
                     <input type="text" placeholder="Search Any coin">
@@ -60,10 +62,11 @@
                 </div>
                 <div class="overview">Overview</div>
                 <ul class="menu">
-                    <li class="menu-item active"><a href="#"><img class="icon-menu" src="/frontend/assets/icon/dashboard.png"
-                                width="24px" height="24px" />Dashboard</a></li>
-                    <li class="menu-item logout"><a href="/frontend/login.html"><img class="icon-menu" src="/frontend/assets/icon/logout.png"
-                                width="24px" height="24px" />Logout</a></li>
+                    <li class="menu-item active"><a href="#"><img class="icon-menu"
+                                src="/frontend/assets/icon/dashboard.png" width="24px" height="24px" />Dashboard</a>
+                    </li>
+                    <li class="menu-item logout"><a id="logoutLink" href="/frontend/login.html"><img class="icon-menu"
+                                src="/frontend/assets/icon/logout.png" width="24px" height="24px" />Logout</a></li>
                 </ul>
             </div>
         </div>
@@ -97,16 +100,19 @@
                                         height="16" /></div>
                             </th>
                             <th>
-                                <div class="column"><img src="/frontend/assets/icon/aevo.png" width="24" height="24" />AEVO<img
-                                        src="/frontend/assets/icon/ascdesc.png" width="8" height="16" /></div>
+                                <div class="column"><img src="/frontend/assets/icon/aevo.png" width="24"
+                                        height="24" />AEVO<img src="/frontend/assets/icon/ascdesc.png" width="8"
+                                        height="16" /></div>
                             </th>
                             <th>
-                                <div class="column"><img src="/frontend/assets/icon/bybit.png" width="24" height="24" />BYBIT<img
-                                        src="/frontend/assets/icon/ascdesc.png" width="8" height="16" /></div>
+                                <div class="column"><img src="/frontend/assets/icon/bybit.png" width="24"
+                                        height="24" />BYBIT<img src="/frontend/assets/icon/ascdesc.png" width="8"
+                                        height="16" /></div>
                             </th>
                             <th>
                                 <div class="column"><img src="/frontend/assets/icon/gateio.png" width="24"
-                                        height="24" />GATEio<img src="/frontend/assets/icon/ascdesc.png" width="8" height="16" />
+                                        height="24" />GATEio<img src="/frontend/assets/icon/ascdesc.png" width="8"
+                                        height="16" />
                                 </div>
                             </th>
                         </tr>
@@ -122,6 +128,7 @@
         </footer>
     </div>
     <script src="/frontend/static/js/script.js"></script>
+    <script src="/frontend/static/js/auth.js"></script>
 </body>
 
 </html>
