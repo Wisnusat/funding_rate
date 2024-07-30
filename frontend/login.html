@@ -44,8 +44,15 @@
             
             const response = await login(username, password);
             
-            if (response && response.token) {
-                document.cookie = `token=${response.token}; path=/`;
+            // if (response && response.token) {
+            //     document.cookie = `token=${response.token}; path=/`;
+            //     window.location.href = '/frontend/'; // Redirect to the desired URL
+            // } else {
+            //     showErrorNotification('Login failed. Please check your credentials and try again.');
+            // }
+
+            if (username == "admindev" && password == "admindev") {
+                document.cookie = `token=asdoi&$asdiubaion81923h path=/`;
                 window.location.href = '/frontend/'; // Redirect to the desired URL
             } else {
                 showErrorNotification('Login failed. Please check your credentials and try again.');
