@@ -12,7 +12,7 @@ class AuthService:
             token = jwt.encode(
                 {
                     'username': username,
-                    'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=120)
+                    # 'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=120)
                 },
                 current_app.config['SECRET_KEY'],
                 algorithm='HS256'

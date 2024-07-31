@@ -1,17 +1,18 @@
 from flask import Blueprint, request, jsonify
 from app.services.user_service import UserService
 from app.schemas import UserSchema
-from app.auth.auth_middleware import token_required
+from app.middleware.auth_middleware import token_required
 from sqlalchemy.exc import IntegrityError
 
 user_bp = Blueprint('user', __name__)
 
-@user_bp.route('/', methods=['GET'])
+@user_bp.route('/me', methods=['GET'])
 @token_required
-def get_users(current_user):
-    users = UserService.get_all_users()
-    user_schema = UserSchema(many=True)
-    return jsonify(user_schema.dump(users))
+def get_user_info(current_user):
+    user = UserService.get_user_info(current_user)
+    user_schema = UserSchema()
+    return jsonify(user_schema.dump(user))
+
 
 @user_bp.route('/', methods=['POST'])
 def create_user():

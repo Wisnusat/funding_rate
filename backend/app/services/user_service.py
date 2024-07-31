@@ -4,8 +4,8 @@ from werkzeug.security import generate_password_hash
 
 class UserService:
     @staticmethod
-    def get_all_users():
-        return User.query.all()
+    def get_user_info(username):
+        return User.query.filter_by(username=username).first()
 
     @staticmethod
     def create_user(username, password):
