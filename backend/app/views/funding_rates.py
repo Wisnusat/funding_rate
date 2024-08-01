@@ -5,15 +5,6 @@ from app.services.fr_service import FrService
 
 funding_rates_bp = Blueprint('funding-rates', __name__)
 
-@funding_rates_bp.route('/market', methods=['GET'])
-@token_required
-def get_market(current_user):
-    try:
-        markets = FrService.get_market_pairs_from_aevo()
-        return jsonify(markets)
-    except Exception as e:
-        return jsonify({'code': 500, 'message': str(e)}), 500
-
 @funding_rates_bp.route('/aevo', methods=['GET'])
 @token_required
 def get_aevo_rates(current_user):
@@ -21,9 +12,10 @@ def get_aevo_rates(current_user):
     limit = request.args.get('limit', default=10, type=int)
     time = request.args.get('time', default='1h', type=str)
     sort_order = request.args.get('sort_order', default='asc', type=str)
+    keyword = request.args.get('keyword', default=None, type=str)
 
     try:
-        rates = aevo.fetch_all_funding_history(page, limit, time, sort_order)
+        rates = aevo.fetch_all_funding_history(page, limit, time, sort_order, keyword)
         return jsonify(rates)
     except Exception as e:
         return jsonify({'code': 500, 'message': str(e)}), 500

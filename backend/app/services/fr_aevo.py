@@ -7,8 +7,12 @@ logging.basicConfig(level=logging.DEBUG)
 
 class aevo():
     @staticmethod
-    def fetch_all_funding_history(page, limit, time, sort_order):
+    def fetch_all_funding_history(page, limit, time, sort_order, keyword):
         ticker_aevo = load_tickers('aevo')
+
+        # if keyword is provided, filter the list of tickers
+        if keyword:
+            ticker_aevo = [ticker for ticker in ticker_aevo if keyword.lower() in ticker.lower()]
 
         res = {
             "meta": {
