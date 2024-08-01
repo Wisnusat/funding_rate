@@ -77,16 +77,16 @@
                 <button class="refresh-button">Refresh</button>
             </div>
             <div class="time-filters">
-                <button class="time-filter">1H</button>
+                <button class="time-filter active">1H</button>
                 <button class="time-filter">1D</button>
                 <button class="time-filter">7D</button>
                 <button class="time-filter">1M</button>
-                <button class="time-filter active">1Y</button>
+                <button class="time-filter">1Y</button>
             </div>
         </div>
         <main>
             <div class="table-container">
-                <table>
+                <table id="coinTable">
                     <thead>
                         <tr>
                             <th>#</th>
@@ -95,25 +95,16 @@
                             </th>
                             <th>Average</th>
                             <th>
-                                <div class="column"><img src="/frontend/assets/icon/hyperliquid.png" width="24"
-                                        height="24" />HYPERLiquid<img src="/frontend/assets/icon/ascdesc.png" width="8"
-                                        height="16" /></div>
+                                <div class="column"><img src="/frontend/assets/icon/hyperliquid.png" width="24" height="24" />HYPERLiquid<img src="/frontend/assets/icon/ascdesc.png" width="8" height="16" /></div>
                             </th>
                             <th>
-                                <div class="column"><img src="/frontend/assets/icon/aevo.png" width="24"
-                                        height="24" />AEVO<img src="/frontend/assets/icon/ascdesc.png" width="8"
-                                        height="16" /></div>
+                                <div class="column"><img src="/frontend/assets/icon/aevo.png" width="24" height="24" />AEVO<img src="/frontend/assets/icon/ascdesc.png" width="8" height="16" /></div>
                             </th>
                             <th>
-                                <div class="column"><img src="/frontend/assets/icon/bybit.png" width="24"
-                                        height="24" />BYBIT<img src="/frontend/assets/icon/ascdesc.png" width="8"
-                                        height="16" /></div>
+                                <div class="column"><img src="/frontend/assets/icon/bybit.png" width="24" height="24" />BYBIT<img src="/frontend/assets/icon/ascdesc.png" width="8" height="16" /></div>
                             </th>
                             <th>
-                                <div class="column"><img src="/frontend/assets/icon/gateio.png" width="24"
-                                        height="24" />GATEio<img src="/frontend/assets/icon/ascdesc.png" width="8"
-                                        height="16" />
-                                </div>
+                                <div class="column"><img src="/frontend/assets/icon/gateio.png" width="24" height="24" />GATEio<img src="/frontend/assets/icon/ascdesc.png" width="8" height="16" /></div>
                             </th>
                         </tr>
                     </thead>
@@ -122,12 +113,13 @@
                     </tbody>
                 </table>
             </div>
+            <div id="loadingSpinner" class="spinner" style="display: none;"></div>
         </main>
         <footer class="footer">
             <p>Current UTC Time: 06:51</p>
         </footer>
     </div>
-    <script src="/frontend/static/js/script.js"></script>
+    <script src="/frontend/static/js/script.js" type="module"></script>
     <script src="/frontend/static/js/auth.js"></script>
 </body>
 

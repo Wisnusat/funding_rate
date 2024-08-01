@@ -1,103 +1,179 @@
-document.addEventListener('DOMContentLoaded', () => {
-    const COIN_DATA = [
-        { rank: 1, coin: "Bitcoin BTC", logo: "https://cryptologos.cc/logos/bitcoin-btc-logo.png", average: "-0.65%", hyperliquid: "-0.65%", aevo: "0.65%", bybit: "-0.65%", gateio: "0.65%" },
-        { rank: 2, coin: "Ethereum ETH", logo: "https://cryptologos.cc/logos/ethereum-eth-logo.png", average: "-0.65%", hyperliquid: "-0.65%", aevo: "0.65%", bybit: "-0.65%", gateio: "0.65%" },
-        { rank: 3, coin: "Cardano ADA", logo: "https://cryptologos.cc/logos/cardano-ada-logo.png", average: "-0.65%", hyperliquid: "-0.65%", aevo: "0.65%", bybit: "-0.65%", gateio: "0.65%" },
-        { rank: 4, coin: "Binance BNB", logo: "https://cryptologos.cc/logos/binance-coin-bnb-logo.png", average: "-0.65%", hyperliquid: "-0.65%", aevo: "0.65%", bybit: "-0.65%", gateio: "0.65%" },
-        { rank: 5, coin: "Tether USDT", logo: "https://cryptologos.cc/logos/tether-usdt-logo.png", average: "-0.65%", hyperliquid: "-0.65%", aevo: "0.65%", bybit: "-0.65%", gateio: "0.65%" },
-        { rank: 6, coin: "XRP XRP", logo: "https://cryptologos.cc/logos/xrp-xrp-logo.png", average: "-0.65%", hyperliquid: "-0.65%", aevo: "0.65%", bybit: "-0.65%", gateio: "0.65%" },
-        { rank: 7, coin: "Polkadot DOT", logo: "https://cryptologos.cc/logos/polkadot-new-dot-logo.png", average: "-0.65%", hyperliquid: "-0.65%", aevo: "0.65%", bybit: "-0.65%", gateio: "0.65%" }
-    ];
-    const CHEVRON_GREEN = '/frontend/assets/icon/chevron-green.png';
-    const CHEVRON_RED = '/frontend/assets/icon/chevron-red.png';
-    const tableBody = document.getElementById('coinTableBody');
+import { fetchAevo } from "../../config/apiService.js";
 
-    const renderFundRate = (rate) => {
-        const icon = rate.includes('-') ? CHEVRON_RED : CHEVRON_GREEN;
-        return `<img src="${icon}" alt="${rate.includes('-') ? 'Down' : 'Up'}" class="chevron-icon"> ${rate}`;
-    };
+const loadingSpinner = document.getElementById('loadingSpinner');
+const CHEVRON_GREEN = '/frontend/assets/icon/chevron-green.png';
+const CHEVRON_RED = '/frontend/assets/icon/chevron-red.png';
+const tableBody = document.getElementById('coinTableBody');
 
-    const renderTableRow = (coin) => {
-        const [name, abbreviation] = coin.coin.split(' ');
-        return `
-            <tr onclick="window.location.href='/frontend/detail.html?coin=${abbreviation}'" style="cursor:pointer;">
-                <td>${coin.rank}</td>
-                <td class="sticky-col">
-                    <img src="${coin.logo}" alt="${coin.coin} logo" class="coin-logo"> 
-                    ${name} <span class="badge">${abbreviation}</span>
-                </td>
-                <td class="${coin.average.includes('-') ? 'down' : 'up'}">${renderFundRate(coin.average)}</td>
-                <td class="${coin.hyperliquid.includes('-') ? 'down' : 'up'}">${renderFundRate(coin.hyperliquid)}</td>
-                <td class="${coin.aevo.includes('-') ? 'down' : 'up'}">${renderFundRate(coin.aevo)}</td>
-                <td class="${coin.bybit.includes('-') ? 'down' : 'up'}">${renderFundRate(coin.bybit)}</td>
-                <td class="${coin.gateio.includes('-') ? 'down' : 'up'}">${renderFundRate(coin.gateio)}</td>
-            </tr>
-        `;
-    };
+const formatToFiveDecimalPlaces = (numberString) => {
+    const number = parseFloat(numberString);
+    const parts = numberString.split('.');
+    if (parts.length > 1 && parts[1].length > 5) {
+        return number.toFixed(5);
+    }
+    return numberString;
+};
 
-    const renderTable = (data) => {
-        tableBody.innerHTML = data.map(renderTableRow).join('');
-    };
+const renderFundRate = (rate) => {
+    const icon = rate.includes('-') ? CHEVRON_RED : CHEVRON_GREEN;
+    return `<img src="/frontend/assets/icon/loading-placeholder.png" data-src="${icon}" alt="${rate.includes('-') ? 'Down' : 'Up'}" class="chevron-icon lazy"> ${formatToFiveDecimalPlaces(rate)}`;
+};
 
-    const toggleActiveClass = (buttons, activeButton) => {
-        buttons.forEach(button => button.classList.remove('active'));
-        activeButton.classList.add('active');
-    };
+const renderTableRow = (coin, index) => {
+    const up = "0.65";
+    const down = "-0.65";
+    return `
+        <tr onclick="window.location.href='/frontend/detail.html?coin=${coin.coin}'" style="cursor:pointer;">
+            <td>${index + 1}</td>
+            <td class="sticky-col">
+                <img src="/frontend/assets/icon/loading-placeholder.png" data-src="${coin.logo}" class="coin-logo lazy">
+                ${coin.coin} <span class="badge">${coin.coin}</span>
+            </td>
+            <td class="${down.includes('-') ? 'down' : 'up'}">${renderFundRate("-0.65")}</td>
+            <td class="${up.includes('-') ? 'down' : 'up'}">${renderFundRate("0.65")}</td>
+            <td class="${coin.rate.includes('-') ? 'down' : 'up'}">${renderFundRate(coin.rate)}</td>
+            <td class="${down.includes('-') ? 'down' : 'up'}">${renderFundRate("-0.65")}</td>
+            <td class="${up.includes('-') ? 'down' : 'up'}">${renderFundRate("0.65")}</td>
+        </tr>
+    `;
+};
 
-    const getCookie = (name) => {
-        const value = `; ${document.cookie}`;
-        const parts = value.split(`; ${name}=`);
-        return parts.length === 2 ? parts.pop().split(';').shift() : null;
-    };
+const renderTable = (data, startIndex) => {
+    tableBody.innerHTML += data.map((coin, index) => renderTableRow(coin, startIndex + index)).join('');
+    lazyLoadImages(); // Lazy load images after rendering new data
+};
 
-    const decodeToken = (token) => jwt_decode(token);
+const toggleActiveClass = (buttons, activeButton) => {
+    buttons.forEach(button => button.classList.remove('active'));
+    activeButton.classList.add('active');
+};
 
-    const displayUsername = () => {
-        const token = getCookie('token');
-        if (token) {
-            const { username } = decodeToken(token); // Assuming the token contains a 'username' field
-            const usernameDisplayElements = document.querySelectorAll('#usernameDisplay');
-            usernameDisplayElements.forEach(element => {
-                element.textContent = `${username}!`;
-            });
+const getCookie = (name) => {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    return parts.length === 2 ? parts.pop().split(';').shift() : null;
+};
+
+const decodeToken = (token) => jwt_decode(token);
+
+const displayUsername = () => {
+    const token = getCookie('token');
+    if (token) {
+        const { username } = decodeToken(token); // Assuming the token contains a 'username' field
+        const usernameDisplayElements = document.querySelectorAll('#usernameDisplay');
+        usernameDisplayElements.forEach(element => {
+            element.textContent = `${username}!`;
+        });
+    }
+};
+
+const openDrawer = () => {
+    drawer.classList.add('open');
+    overlay.classList.add('open');
+};
+
+const closeDrawerAndOverlay = () => {
+    drawer.classList.remove('open');
+    overlay.classList.remove('open');
+};
+
+const logout = (event) => {
+    event.preventDefault(); // Prevent the default link behavior
+    document.cookie = 'token=; Max-Age=0; path=/; domain=' + window.location.hostname; // Delete the authentication token cookie
+    window.location.href = '/frontend/login.html'; // Redirect to the login page
+};
+
+// Setup time filter buttons
+const timeFilters = document.querySelectorAll('.time-filter');
+timeFilters.forEach(button => button.addEventListener('click', () => toggleActiveClass(timeFilters, button)));
+
+// Setup drawer menu
+const hamburgerMenu = document.getElementById('hamburger-menu');
+const drawer = document.getElementById('drawer');
+const overlay = document.getElementById('overlay');
+const closeDrawerButton = document.getElementById('close-drawer');
+hamburgerMenu.addEventListener('click', openDrawer);
+closeDrawerButton.addEventListener('click', closeDrawerAndOverlay);
+overlay.addEventListener('click', closeDrawerAndOverlay);
+
+// Setup logout link
+document.getElementById('logoutLink').addEventListener('click', logout);
+
+// Infinite scroll logic
+let currentPage = 1;
+const limitPerPage = 10;
+let isFetching = false;
+let allCoinData = []; // Array to store all coin data
+
+const fetchAndRenderCoinData = async () => {
+    console.log("Fetching data..."); // Debugging log
+    if (isFetching) return;
+    isFetching = true;
+    loadingSpinner.style.display = 'block'; // Show the loading spinner
+    const data = await fetchAevo(currentPage, limitPerPage);
+    loadingSpinner.style.display = 'none'; // Hide the loading spinner
+    if (data && data.data && data.data.length > 0) {
+        allCoinData = data.data; // Concatenate new data with old data
+        renderTable(data.data, (currentPage - 1) * limitPerPage);
+        currentPage++;
+        repositionSentinel();
+    }
+    isFetching = false;
+};
+
+const repositionSentinel = () => {
+    let sentinel = document.getElementById('sentinel');
+    if (sentinel) {
+        tableBody.removeChild(sentinel);
+    }
+    sentinel = document.createElement('tr');
+    sentinel.setAttribute('id', 'sentinel');
+    tableBody.appendChild(sentinel);
+    observer.observe(sentinel);
+};
+
+const observerOptions = {
+    root: document.querySelector('.table-container'),
+    rootMargin: '0px',
+    threshold: 1.0
+};
+
+const lazyLoadImages = () => {
+    const images = document.querySelectorAll('img.lazy');
+    const imageObserver = new IntersectionObserver((entries, observer) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const img = entry.target;
+                img.src = img.dataset.src;
+                img.classList.remove('lazy');
+                observer.unobserve(img);
+            }
+        });
+    });
+
+    images.forEach(image => {
+        imageObserver.observe(image);
+    });
+};
+
+let debounceTimer;
+const debounce = (callback, delay) => {
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(callback, delay);
+};
+
+const observer = new IntersectionObserver(async (entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting && !isFetching) {
+            debounce(() => {
+                console.log("Sentinel is intersecting, fetching more data...");
+                fetchAndRenderCoinData();
+            }, 200); // Debounce delay of 200ms
         }
-    };
+    });
+}, observerOptions);
 
-    const openDrawer = () => {
-        drawer.classList.add('open');
-        overlay.classList.add('open');
-    };
-
-    const closeDrawerAndOverlay = () => {
-        drawer.classList.remove('open');
-        overlay.classList.remove('open');
-    };
-
-    const logout = (event) => {
-        event.preventDefault(); // Prevent the default link behavior
-        document.cookie = 'token=; Max-Age=0; path=/; domain=' + window.location.hostname; // Delete the authentication token cookie
-        window.location.href = '/frontend/login.html'; // Redirect to the login page
-    };
-
-    // Render table on page load
-    renderTable(COIN_DATA);
-
-    // Setup time filter buttons
-    const timeFilters = document.querySelectorAll('.time-filter');
-    timeFilters.forEach(button => button.addEventListener('click', () => toggleActiveClass(timeFilters, button)));
-
-    // Setup drawer menu
-    const hamburgerMenu = document.getElementById('hamburger-menu');
-    const drawer = document.getElementById('drawer');
-    const overlay = document.getElementById('overlay');
-    const closeDrawerButton = document.getElementById('close-drawer');
-    hamburgerMenu.addEventListener('click', openDrawer);
-    closeDrawerButton.addEventListener('click', closeDrawerAndOverlay);
-    overlay.addEventListener('click', closeDrawerAndOverlay);
-
-    // Setup logout link
-    document.getElementById('logoutLink').addEventListener('click', logout);
-
-    // Display username on page load
+document.addEventListener("DOMContentLoaded", () => {
     displayUsername();
+    fetchAndRenderCoinData();
 });

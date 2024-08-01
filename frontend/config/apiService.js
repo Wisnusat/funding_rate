@@ -60,8 +60,33 @@ const register = async (username, password) => {
     }
 };
 
+const fetchAevo = async (page, limit) => {
+    console.log("feching...");
+    const token = getCookie('token'); // Ambil token dari cookie
+
+    try {
+        const response = await fetch(API_CONFIG.endpoints.aevo(page, limit), {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}` // Menambahkan token pada header
+            },
+        });
+
+        if (!response.ok) {
+            return response.json();
+        }
+        
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        return error;
+    }
+};
+
 export {
     fetchData,
     login,
     register,
+    fetchAevo,
 };
