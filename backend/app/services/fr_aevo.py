@@ -1,6 +1,6 @@
 import requests
-from datetime import datetime, timedelta
-
+from datetime import datetime, timedelta, timezone
+from app.utils import load_tickers, get_logo_url
 import logging
 # Configure logging
 logging.basicConfig(level=logging.DEBUG)
@@ -8,7 +8,7 @@ logging.basicConfig(level=logging.DEBUG)
 class aevo():
     @staticmethod
     def fetch_all_funding_history(page, limit, time, sort_order):
-        ticker_aevo = ['10000SATS-PERP', '1000BONK-PERP', '1000PEPE-PERP', 'AEVO-PERP', 'ALT-PERP', 'APT-PERP', 'AR-PERP', 'ARB-PERP', 'ATOM-PERP', 'AVAX-PERP', 'AXL-PERP', 'BEAMX-PERP', 'BITCOIN-PERP', 'BLAST-PERP', 'BLUR-PERP', 'BLZ-PERP', 'BNB-PERP', 'BTC-PERP', 'CANTO-PERP', 'CRV-PERP', 'DOGE-PERP', 'DYDX-PERP', 'DYM-PERP', 'ENA-PERP', 'ETH-PERP', 'ETHFI-PERP', 'FTM-PERP', 'GLMR-PERP', 'HIFI-PERP', 'HPOS-PERP', 'ILV-PERP', 'INJ-PERP', 'JITO-PERP', 'JUP-PERP', 'LDO-PERP', 'LINK-PERP', 'MANTA-PERP', 'MATIC-PERP', 'MEME-PERP', 'MERL-PERP', 'MINA-PERP', 'MKR-PERP', 'MYRO-PERP', 'NEAR-PERP', 'NMR-PERP', 'NTRN-PERP', 'OMNI-PERP', 'OP-PERP', 'ORDI-PERP', 'OX-PERP', 'PARCL-PERP', 'PENDLE-PERP', 'PIXEL-PERP', 'PORTAL-PERP', 'PRIME-PERP', 'PYTH-PERP', 'SAGA-PERP', 'SEI-PERP', 'SHFL-PERP', 'SLERF-PERP', 'SOL-PERP', 'STRK-PERP', 'SUI-PERP', 'SYN-PERP', 'T-PERP', 'TAO-PERP', 'TIA-PERP', 'TNSR-PERP', 'TON-PERP', 'TRB-PERP', 'TRX-PERP', 'UMA-PERP', 'W-PERP', 'WIF-PERP', 'WLD-PERP', 'XRP-PERP', 'ZERO-PERP', 'ZETA-PERP']
+        ticker_aevo = load_tickers('aevo')
 
         res = {
             "meta": {
@@ -20,6 +20,7 @@ class aevo():
                 "totalPages": 0,
                 "totalItems": 0,
                 "isNextPage": False,
+                "date": datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S %Z'),
             },
             "data": []
         }
@@ -46,102 +47,13 @@ class aevo():
             data_per_ticker = {
                 "coin": ticker_name.split('-')[0],
                 "badge": ticker_name,
-                "logo": aevo.get_logo_url(ticker_name.split('-')[0]),
+                "logo": get_logo_url(ticker_name.split('-')[0]),
                 "rates": funding_history
             }
             
             res['data'].append(data_per_ticker)
 
         return res
-
-    @staticmethod
-    def get_logo_url(ticker_symbol):
-        name_mappings = {
-            '10000SATS': 'bitcoin',
-            '1000BONK': 'bonk',
-            '1000PEPE': 'pepecoin',
-            'AEVO': 'aevo',
-            'ALT': 'altcoin',
-            'APT': 'aptos',
-            'AR': 'arweave',
-            'ARB': 'arbitrum',
-            'ATOM': 'cosmos',
-            'AVAX': 'avalanche',
-            'AXL': 'axelar',
-            'BEAMX': 'beam',
-            'BITCOIN': 'bitcoin',
-            'BLAST': 'blast',
-            'BLUR': 'blur',
-            'BLZ': 'bluzelle',
-            'BNB': 'binance-coin',
-            'BTC': 'bitcoin',
-            'CANTO': 'canto',
-            'CRV': 'curve',
-            'DOGE': 'dogecoin',
-            'DYDX': 'dydx',
-            'DYM': 'dym',
-            'ENA': 'ena',
-            'ETH': 'ethereum',
-            'ETHFI': 'ethfi',
-            'FTM': 'fantom',
-            'GLMR': 'glimmer',
-            'HIFI': 'hifi',
-            'HPOS': 'hpos',
-            'ILV': 'illuvium',
-            'INJ': 'injective',
-            'JITO': 'jito',
-            'JUP': 'jupiter',
-            'LDO': 'lido',
-            'LINK': 'chainlink',
-            'MANTA': 'mantle',
-            'MATIC': 'polygon',
-            'MEME': 'meme',
-            'MERL': 'merlin',
-            'MINA': 'mina',
-            'MKR': 'maker',
-            'MYRO': 'myro',
-            'NEAR': 'near',
-            'NMR': 'numeraire',
-            'NTRN': 'ntrn',
-            'OMNI': 'omni',
-            'OP': 'optimism',
-            'ORDI': 'ordi',
-            'OX': 'ox',
-            'PARCL': 'parcl',
-            'PENDLE': 'pendle',
-            'PIXEL': 'pixel',
-            'PORTAL': 'portal',
-            'PRIME': 'prime',
-            'PYTH': 'pyth',
-            'SAGA': 'saga',
-            'SEI': 'sei',
-            'SHFL': 'shfl',
-            'SLERF': 'slerf',
-            'SOL': 'solana',
-            'STRK': 'strike',
-            'SUI': 'sui',
-            'SYN': 'syn',
-            'T': 'threshold',
-            'TAO': 'tao',
-            'TIA': 'tia',
-            'TNSR': 'tnsr',
-            'TON': 'toncoin',
-            'TRB': 'tellor',
-            'TRX': 'tron',
-            'UMA': 'uma',
-            'W': 'w',
-            'WIF': 'wif',
-            'WLD': 'wld',
-            'XRP': 'ripple',
-            'ZERO': 'zero',
-            'ZETA': 'zeta',
-            # Add more mappings as needed
-        }
-        name = name_mappings.get(ticker_symbol.upper())
-        if name:
-            return f"https://cryptologos.cc/logos/{name}-{ticker_symbol.lower()}-logo.png"
-        else:
-            return None
 
     @staticmethod
     def fetch_single_funding_history(ticker, time):
@@ -224,12 +136,12 @@ class aevo():
                         median_rate = rates[median_index]
 
                     median_record = all_rates[median_index]
-
+                    date_utc = datetime.fromtimestamp(int(median_record[1]) / 1_000_000_000, tz=timezone.utc).strftime('%Y-%m-%d %H:%M:%S %Z')
                     results.append({
                         'rate': median_record[2],
                         'price': median_record[3],
                         'time': interval_name,
-                        'date': datetime.fromtimestamp(int(median_record[1]) / 1_000_000_000).strftime('%Y-%m-%d %H:%M:%S')
+                        'date': date_utc
                     })
                 else:
                     logging.debug(f"No valid rates found for interval {interval_name}")
