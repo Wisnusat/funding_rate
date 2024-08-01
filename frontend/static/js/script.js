@@ -29,7 +29,7 @@ const renderTableRow = (coin, index) => {
     const up = "0.65";
     const down = "-0.65";
     return `
-        <tr onclick="window.location.href='/frontend/detail.html?coin=${coin.coin}'" style="cursor:pointer;">
+        <tr onclick="window.location.href='/frontend/detail.html?coin=${coin.coin}&logo=${coin.logo}'" style="cursor:pointer;">
             <td class="sticky-col">
                 <img src="/frontend/assets/icon/loading-placeholder.png" data-src="${coin.logo}" class="coin-logo lazy">
                 ${coin.coin}
