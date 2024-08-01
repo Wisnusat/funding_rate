@@ -30,14 +30,13 @@ const renderTableRow = (coin, index) => {
     const down = "-0.65";
     return `
         <tr onclick="window.location.href='/frontend/detail.html?coin=${coin.coin}'" style="cursor:pointer;">
-            <td>${index + 1}</td>
             <td class="sticky-col">
                 <img src="/frontend/assets/icon/loading-placeholder.png" data-src="${coin.logo}" class="coin-logo lazy">
-                ${coin.coin} <span class="badge">${coin.coin}</span>
+                ${coin.coin}
             </td>
             <td class="${down.includes('-') ? 'down' : 'up'}">${renderFundRate("-0.65")}</td>
-            <td class="${up.includes('-') ? 'down' : 'up'}">${renderFundRate("0.65")}</td>
             <td class="${coin.rate.includes('-') ? 'down' : 'up'}">${renderFundRate(coin.rate)}</td>
+            <td class="${up.includes('-') ? 'down' : 'up'}">${renderFundRate("0.65")}</td>
             <td class="${down.includes('-') ? 'down' : 'up'}">${renderFundRate("-0.65")}</td>
             <td class="${up.includes('-') ? 'down' : 'up'}">${renderFundRate("0.65")}</td>
         </tr>
@@ -111,7 +110,7 @@ document.getElementById('logoutLink').addEventListener('click', logout);
 
 // Infinite scroll logic
 let currentPage = 1;
-const limitPerPage = 10;
+const limitPerPage = 20;
 let isFetching = false;
 let allCoinData = []; // Array to store all coin data
 

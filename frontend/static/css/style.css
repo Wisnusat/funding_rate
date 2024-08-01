@@ -246,14 +246,28 @@ table td {
     padding: 15px;
     text-align: left;
     font-weight: 600;
-    white-space: nowrap;
-    /* Prevent text from wrapping */
+    white-space: nowrap; /* Prevent text from wrapping */
+    background-color: #FAFAFA; /* Ensure transparency */
+}
+
+table th {
+    position: -webkit-sticky; /* For Safari */
+    position: sticky;
+    top: 0;
+    z-index: 2; /* Ensure the header stays on top of table rows */
     background-color: #FAFAFA;
-    /* Ensure transparency */
 }
 
 table td {
     cursor: pointer;
+}
+
+.sticky-header {
+    position: -webkit-sticky; /* For Safari */
+    position: sticky;
+    left: 0;
+    background: #FAFAFA;
+    z-index: 4;
 }
 
 .sticky-col {
@@ -261,7 +275,7 @@ table td {
     position: sticky;
     left: 0;
     background: #FAFAFA;
-    z-index: 1;
+    z-index: 3;
 }
 
 .column {
@@ -476,6 +490,10 @@ table td {
         font-size: 12px;
     }
 
+    table th {
+        font-size: 12px;
+    }
+
     table td {
         font-size: 12px;
     }
@@ -487,7 +505,7 @@ table td {
     }
 
     .table-container {
-        padding: 4px 0px 4px 0px;
+        padding: 0px 0px 0px 0px;
     }
 
     .header-mobile {
