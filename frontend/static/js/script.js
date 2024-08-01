@@ -4,6 +4,12 @@ const loadingSpinner = document.getElementById('loadingSpinner');
 const CHEVRON_GREEN = '/frontend/assets/icon/chevron-green.png';
 const CHEVRON_RED = '/frontend/assets/icon/chevron-red.png';
 const tableBody = document.getElementById('coinTableBody');
+const refreshButton = document.querySelector('.refresh-button');
+const searchBarMobile = document.getElementById('searchBarMobile');
+const searchBarDesktop = document.getElementById('searchBarDesktop');
+
+let currentTimeFilter = '1h'; // Default time filter
+let searchQuery = ''; // Default search query
 
 const formatToFiveDecimalPlaces = (numberString) => {
     const number = parseFloat(numberString);
@@ -85,7 +91,11 @@ const logout = (event) => {
 
 // Setup time filter buttons
 const timeFilters = document.querySelectorAll('.time-filter');
-timeFilters.forEach(button => button.addEventListener('click', () => toggleActiveClass(timeFilters, button)));
+timeFilters.forEach(button => button.addEventListener('click', () => {
+    toggleActiveClass(timeFilters, button);
+    currentTimeFilter = button.textContent.toLocaleLowerCase(); // Update current time filter
+    refreshData(); // Refresh data when the time filter is changed
+}));
 
 // Setup drawer menu
 const hamburgerMenu = document.getElementById('hamburger-menu');
@@ -106,11 +116,11 @@ let isFetching = false;
 let allCoinData = []; // Array to store all coin data
 
 const fetchAndRenderCoinData = async () => {
-    console.log("Fetching data..."); // Debugging log
+    console.log("Fetching data with:", { currentPage, limitPerPage, currentTimeFilter, searchQuery }); // Debugging log
     if (isFetching) return;
     isFetching = true;
     loadingSpinner.style.display = 'block'; // Show the loading spinner
-    const data = await fetchAevo(currentPage, limitPerPage);
+    const data = await fetchAevo(currentPage, limitPerPage, currentTimeFilter, searchQuery); // Pass the time filter and search query as arguments
     loadingSpinner.style.display = 'none'; // Hide the loading spinner
     if (data && data.data && data.data.length > 0) {
         allCoinData = data.data; // Concatenate new data with old data
@@ -172,6 +182,31 @@ const observer = new IntersectionObserver(async (entries) => {
         }
     });
 }, observerOptions);
+
+const refreshData = () => {
+    console.log("Refreshing data..."); // Debugging log
+    currentPage = 1;
+    allCoinData = [];
+    tableBody.innerHTML = '';
+    fetchAndRenderCoinData();
+};
+
+refreshButton.addEventListener('click', refreshData);
+
+// Event listener for search bar
+searchBarMobile.addEventListener('input', () => {
+    debounce(() => {
+        searchQuery = searchBarMobile.value;
+        refreshData(); // Refresh data when the search query changes
+    }, 300); // Debounce delay of 300ms
+});
+
+searchBarDesktop.addEventListener('input', () => {
+    debounce(() => {
+        searchQuery = searchBarDesktop.value;
+        refreshData(); // Refresh data when the search query changes
+    }, 300); // Debounce delay of 300ms
+});
 
 document.addEventListener("DOMContentLoaded", () => {
     displayUsername();

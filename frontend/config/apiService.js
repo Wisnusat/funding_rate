@@ -60,12 +60,12 @@ const register = async (username, password) => {
     }
 };
 
-const fetchAevo = async (page, limit) => {
+const fetchAevo = async (page, limit, time, keyword) => {
     console.log("feching...");
     const token = getCookie('token'); // Ambil token dari cookie
 
     try {
-        const response = await fetch(API_CONFIG.endpoints.aevo(page, limit), {
+        const response = await fetch(API_CONFIG.endpoints.aevo(page, limit, time, keyword), {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
