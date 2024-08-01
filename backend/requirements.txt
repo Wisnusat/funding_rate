@@ -6,7 +6,5 @@ python-dotenv
 psycopg2-binary
 PyJWT
 ccxt
-logging
 requests
 flask-cors
-pandas
