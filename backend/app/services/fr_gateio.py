@@ -6,14 +6,14 @@ import numpy as np
 from app.utils import get_timeframe, load_tickers, get_logo_url
 from app.services.fr_service import FrService
 
-class Hyperliquid:
+class Gateio:
     @staticmethod
     def fetch_funding_rate_history(page, limit, time, sort_order, keyword):
         res = {
             "meta": {
-                "v_platform": 'hyperliquid-ccxt',
-                "v_endpoint": "https://docs.ccxt.com/#/exchanges/hyperliquid?id=fetchfundingratehistory",
-                "v_docs": "https://docs.ccxt.com/#/exchanges/hyperliquid?id=fetchfundingratehistory",
+                "v_platform": 'gateio-ccxt',
+                "v_endpoint": "https://docs.ccxt.com/#/exchanges/gate?id=fetchfundinghistory",
+                "v_docs": "https://docs.ccxt.com/#/exchanges/gate?id=fetchfundinghistory",
                 "page": page,
                 "perPage": limit,
                 "totalPages": 0,
@@ -48,8 +48,8 @@ class Hyperliquid:
         tickers_paginated = tickers[start:end]
 
         for ticker_name in tickers_paginated:
-            ticker_name = f"{ticker_name}/USDC:USDC"
-            funding_history = FrService.fetchFundingWithCCXT('hyperliquid', ticker_name, time)
+            ticker_name = f"{ticker_name}_USDT"
+            funding_history = FrService.fetchFundingWithCCXT('gateio', ticker_name, time)
             # data_per_ticker = {
             #     "coin": ticker_name.split('/')[0],
             #     "badge": ticker_name,

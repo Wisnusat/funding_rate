@@ -5,7 +5,7 @@ import logging
 # Configure logging
 logging.basicConfig(level=logging.DEBUG)
 
-class aevo():
+class Aevo():
     @staticmethod
     def fetch_all_funding_history(page, limit, time, sort_order, keyword):
         ticker_aevo = load_tickers()

@@ -1,7 +1,10 @@
 import requests
 import logging
 from datetime import datetime, timezone
-from app.utils import load_tickers, get_logo_url
+from app.utils import load_tickers, get_logo_url, get_timeframe
+
+import ccxt
+import numpy as np
 
 # Configure logging
 logging.basicConfig(level=logging.DEBUG)
@@ -54,3 +57,22 @@ class FrService:
             res['data'].append(data_per_ticker)
 
         return res
+
+    @staticmethod
+    def fetchFundingWithCCXT(exchange: str, symbol: str, timeframe: str) -> tuple:
+        try:
+            ex = getattr(ccxt, exchange)()
+            params = {}
+            since = None
+            if timeframe is not None:
+                since, until = get_timeframe(timeframe)
+                params['until'] = until
+            funding_history_dict = ex.fetch_funding_rate_history(symbol, since=since, params=params)
+            # funding_time = [datetime.fromtimestamp(d["timestamp"] * 0.001) for d in funding_history_dict]
+            funding_rate = [d["fundingRate"] * 100 for d in funding_history_dict]
+            accumulation = np.sum(funding_rate)
+            return accumulation
+
+        except Exception as e:
+            logging.error(f"Error fetching funding rate history: {e}")
+            return None
