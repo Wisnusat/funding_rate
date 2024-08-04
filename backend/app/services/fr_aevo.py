@@ -48,7 +48,7 @@ class Aevo():
 
         for ticker_name in ticker_aevo_paginated:
             ticker_name = f"{ticker_name}-PERP"
-            funding_history = aevo.fetch_single_funding_history(ticker_name, time)
+            funding_history = Aevo.fetch_single_funding_history(ticker_name, time)
             # data_per_ticker = {
                 # "coin": ticker_name.split('-')[0],
                 # "badge": ticker_name,

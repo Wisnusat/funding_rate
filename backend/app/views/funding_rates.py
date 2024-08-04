@@ -25,7 +25,7 @@ def get_tickers(current_user):
 
 @funding_rates_bp.route('/hyperliquid', methods=['GET'])
 @token_required
-def get_ccxt_rates(current_user):
+def get_hyperliquid_rates(current_user):
     page = request.args.get('page', default=1, type=int)
     limit = request.args.get('limit', default=10, type=int)
     time = request.args.get('time', default='1h', type=str)
@@ -48,7 +48,7 @@ def get_aevo_rates(current_user):
     keyword = request.args.get('keyword', default=None, type=str)
 
     try:
-        rates = aevo.fetch_all_funding_history(page, limit, time, sort_order, keyword)
+        rates = Aevo.fetch_all_funding_history(page, limit, time, sort_order, keyword)
         return jsonify(rates)
     except Exception as e:
         return jsonify({'code': 500, 'message': str(e)}), 500
