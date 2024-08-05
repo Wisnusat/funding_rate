@@ -13,9 +13,5 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Make port 8000 available to the world outside this container
 EXPOSE 8000
 
-# Add the entrypoint script
-COPY entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
-
-# Run the entrypoint script
-ENTRYPOINT ["/entrypoint.sh"]
+# Run the application
+CMD ["flask", "run", "--host=0.0.0.0", "--port=8000"]
