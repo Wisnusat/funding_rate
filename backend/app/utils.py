@@ -1,94 +1,42 @@
 import json
+import re
+from datetime import datetime, timedelta
 
-def load_tickers(platform):
-    with open("ticker.json", 'r') as f:
+def load_tickers():
+    with open("data_const/ticker.json", 'r') as f:
         data = json.load(f)
-    return data[platform]
+    return data
 
-def get_logo_url(ticker_symbol):
-    name_mappings = {
-        '10000SATS': 'bitcoin',
-        '1000BONK': 'bonk',
-        '1000PEPE': 'pepecoin',
-        'AEVO': 'aevo',
-        'ALT': 'altcoin',
-        'APT': 'aptos',
-        'AR': 'arweave',
-        'ARB': 'arbitrum',
-        'ATOM': 'cosmos',
-        'AVAX': 'avalanche',
-        'AXL': 'axelar',
-        'BEAMX': 'beam',
-        'BITCOIN': 'bitcoin',
-        'BLAST': 'blast',
-        'BLUR': 'blur',
-        'BLZ': 'bluzelle',
-        'BNB': 'binance-coin',
-        'BTC': 'bitcoin',
-        'CANTO': 'canto',
-        'CRV': 'curve',
-        'DOGE': 'dogecoin',
-        'DYDX': 'dydx',
-        'DYM': 'dym',
-        'ENA': 'ena',
-        'ETH': 'ethereum',
-        'ETHFI': 'ethfi',
-        'FTM': 'fantom',
-        'GLMR': 'glimmer',
-        'HIFI': 'hifi',
-        'HPOS': 'hpos',
-        'ILV': 'illuvium',
-        'INJ': 'injective',
-        'JITO': 'jito',
-        'JUP': 'jupiter',
-        'LDO': 'lido',
-        'LINK': 'chainlink',
-        'MANTA': 'mantle',
-        'MATIC': 'polygon',
-        'MEME': 'meme',
-        'MERL': 'merlin',
-        'MINA': 'mina',
-        'MKR': 'maker',
-        'MYRO': 'myro',
-        'NEAR': 'near',
-        'NMR': 'numeraire',
-        'NTRN': 'ntrn',
-        'OMNI': 'omni',
-        'OP': 'optimism',
-        'ORDI': 'ordi',
-        'OX': 'ox',
-        'PARCL': 'parcl',
-        'PENDLE': 'pendle',
-        'PIXEL': 'pixel',
-        'PORTAL': 'portal',
-        'PRIME': 'prime',
-        'PYTH': 'pyth',
-        'SAGA': 'saga',
-        'SEI': 'sei',
-        'SHFL': 'shfl',
-        'SLERF': 'slerf',
-        'SOL': 'solana',
-        'STRK': 'strike',
-        'SUI': 'sui',
-        'SYN': 'syn',
-        'T': 'threshold',
-        'TAO': 'tao',
-        'TIA': 'tia',
-        'TNSR': 'tnsr',
-        'TON': 'toncoin',
-        'TRB': 'tellor',
-        'TRX': 'tron',
-        'UMA': 'uma',
-        'W': 'w',
-        'WIF': 'wif',
-        'WLD': 'wld',
-        'XRP': 'ripple',
-        'ZERO': 'zero',
-        'ZETA': 'zeta',
-        # Add more mappings as needed
-    }
-    name = name_mappings.get(ticker_symbol.upper())
-    if name:
-        return f"https://cryptologos.cc/logos/{name}-{ticker_symbol.lower()}-logo.png"
+def get_timeframe(timeframe: str):
+    now = datetime.now()
+    if timeframe == '1h':
+        since = now - timedelta(hours=1)
+    elif timeframe == '1d':
+        since = now - timedelta(days=1)
+    elif timeframe == '7d':
+        since = now - timedelta(days=7)
+    elif timeframe == '1M':
+        since = now - timedelta(days=30)  # Approximation for 1 month
+    elif timeframe == '1y':
+        since = now - timedelta(days=365)
     else:
-        return None
+        raise ValueError("Unsupported timeframe. Use '1h', '1d', '7d', '1M', or '1y'.")
+
+    since_timestamp = int(since.timestamp() * 1000)
+    until_timestamp = int(now.timestamp() * 1000)
+    return since_timestamp, until_timestamp
+
+def get_logo_url(symbol, file_path='data_const/crypto_logos.json'):
+    # Load the JSON content from the file
+    with open(file_path, 'r') as file:
+        cc_coins = json.load(file)
+    
+    # Search for the coin with the matching symbol
+    coin = next((coin for coin in cc_coins.values() if coin['symbol'].lower() == symbol.lower()), None)
+    
+    if coin:
+        # Construct the logo URL
+        logo_url = f"https://cryptologos.cc/logos/{coin['name'].lower().replace(' ', '-')}-{symbol.lower()}-logo.png"
+        return logo_url
+    
+    return None

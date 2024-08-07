@@ -8,3 +8,4 @@ PyJWT
 ccxt
 requests
 flask-cors
+numpy

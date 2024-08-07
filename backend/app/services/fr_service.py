@@ -1,50 +1,17 @@
 import requests
 import logging
+from datetime import datetime, timezone
+from app.utils import load_tickers, get_logo_url, get_timeframe
+
+import ccxt
+import numpy as np
 
 # Configure logging
 logging.basicConfig(level=logging.DEBUG)
 
 class FrService:
     @staticmethod
-    def get_market_pairs_from_aevo():
-        try:
-            url = "https://api.aevo.xyz/assets"
-            response = requests.get(url)
-            response.raise_for_status()
-            data = response.json()
-            logging.debug(f"Market Pairs from Aevo: {data}")
-            # Correctly extract the pairs from the data
-            return [asset['symbol'] for asset in data['assets']]
-        except Exception as e:
-            logging.error(f"Error getting market pairs from Aevo: {str(e)}")
-            return []
-
-    @staticmethod
-    def get_fr_aevo():
-        try:
-            url = "https://api.aevo.xyz/funding-history?limit=50"
-            response = requests.get(url)
-            response.raise_for_status()
-            data = response.json()
-            logging.debug(f"Funding Rates from Aevo: {data}")
-            # Correctly parse the data using 'funding_history' key
-            funding_rates = []
-            for entry in data['funding_history']:
-                try:
-                    funding_rates.append({
-                        'symbol': entry[0],
-                        'timestamp': entry[1],
-                        'rate': float(entry[2])
-                    })
-                except ValueError as ve:
-                    logging.error(f"Error converting rate to float: {entry[2]} - {str(ve)}")
-            return funding_rates
-        except Exception as e:
-            logging.error(f"Error getting funding rates from Aevo: {str(e)}")
-            return []
-
-    @staticmethod
-    def get_all_rates(duration, page, limit, keywords):
+    def tickers(page, limit, time, sort_order, keyword):
         res = {
             "meta": {
                 "page": page,
@@ -52,65 +19,60 @@ class FrService:
                 "totalPages": 0,
                 "totalItems": 0,
                 "isNextPage": False,
+                "date": datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S %Z'),
             },
             "data": []
         }
 
-        # Get pairs from Aevo
-        pairs = FrService.get_market_pairs_from_aevo()
-        logging.debug(f"Pairs: {pairs}")
-        
-        # Get funding rates from Aevo
-        aevo_fr = FrService.get_fr_aevo()
-        logging.debug(f"Aevo Funding Rates: {aevo_fr}")
+        tickers = load_tickers()
 
-        # Process and match funding history with pairs
-        processed_data = []
-        for symbol in pairs:
-            asset_name = symbol.split('-')[0]
-            aevo_rates = []
-            for entry in aevo_fr:
-                logging.debug(f"Checking entry: {entry}")  # Debugging statement
-                if entry['symbol'] == symbol:
-                    logging.debug(f"Matching entry: {entry}")  # Debugging statement
-                    aevo_rates.append(entry['rate'])
+        # if keyword is provided, filter the list of tickers
+        if keyword:
+            tickers = [ticker for ticker in tickers if keyword.lower() in ticker.lower()]
 
-            logging.debug(f"Rates for {symbol}: {aevo_rates}")  # Debugging statement
+        # Sort the ticker list
+        if sort_order == 'desc':
+            tickers.sort(reverse=True)
+        else:
+            tickers.sort()
 
-            average_rate = lambda rates: sum(rates) / len(rates) if rates else None
-            format_rate = lambda rate: f"{rate:.2%}" if rate is not None else "N/A"
+        # Pagination
+        total_items = len(tickers)
+        res["meta"]["totalItems"] = total_items
+        res["meta"]["totalPages"] = (total_items // limit) + (1 if total_items % limit != 0 else 0)
+        res["meta"]["isNextPage"] = page * limit < total_items
 
-            average = average_rate(aevo_rates)
-
-            processed_data.append({
-                "coin": asset_name,
-                "badge": symbol,
-                "logo": f"https://cryptologos.cc/logos/{asset_name.lower()}-{symbol.lower()}-logo.png",
-                "average": format_rate(average),
-                "hyperliquid": "N/A",
-                "aevo": format_rate(average_rate(aevo_rates)),
-                "bybit": "N/A",
-                "gateio": "N/A"
-            })
-        logging.debug(f"Processed Data: {processed_data}")
-        
-        # Apply filtering based on keywords
-        if keywords:
-            processed_data = [entry for entry in processed_data if keywords.lower() in entry['coin'].lower()]
-
-        # Paginate results
-        total_items = len(processed_data)
-        total_pages = (total_items + limit - 1) // limit
-        is_next_page = page < total_pages
-
+        # Apply pagination to tickers
         start = (page - 1) * limit
         end = start + limit
-        paginated_data = processed_data[start:end]
+        tickers_paginated = tickers[start:end]
 
-        # Update meta information
-        res['meta']['totalItems'] = total_items
-        res['meta']['totalPages'] = total_pages
-        res['meta']['isNextPage'] = is_next_page
-        res['data'] = paginated_data
+        for ticker_name in tickers_paginated:
+            data_per_ticker = {
+                "coin": ticker_name.split('-')[0],
+                "badge": ticker_name,
+                "logo": get_logo_url(ticker_name.split('-')[0]),
+            }
+            
+            res['data'].append(data_per_ticker)
 
         return res
+
+    @staticmethod
+    def fetchFundingWithCCXT(exchange: str, symbol: str, timeframe: str) -> tuple:
+        try:
+            ex = getattr(ccxt, exchange)()
+            params = {}
+            since = None
+            if timeframe is not None:
+                since, until = get_timeframe(timeframe)
+                params['until'] = until
+            funding_history_dict = ex.fetch_funding_rate_history(symbol, since=since, params=params)
+            # funding_time = [datetime.fromtimestamp(d["timestamp"] * 0.001) for d in funding_history_dict]
+            funding_rate = [d["fundingRate"] * 100 for d in funding_history_dict]
+            accumulation = np.sum(funding_rate)
+            return accumulation
+
+        except Exception as e:
+            logging.error(f"Error fetching funding rate history: {e}")
+            return None
