@@ -2,20 +2,6 @@ import {
     API_CONFIG
 } from './apiConfig.js';
 
-const fetchData = async (endpoint) => {
-    try {
-        const response = await fetch(`${API_CONFIG.baseUrl}${endpoint}`);
-        if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-        const data = await response.json();
-        return data;
-    } catch (error) {
-        console.error('Error fetching data:', error);
-        return null;
-    }
-};
-
 const login = async (username, password) => {
     try {
         const response = await fetch(API_CONFIG.endpoints.auth, {
@@ -61,7 +47,6 @@ const register = async (username, password) => {
 };
 
 const fetchAevo = async (page, limit, time, keyword) => {
-    console.log("feching...");
     const token = getCookie('token'); // Ambil token dari cookie
 
     try {
@@ -84,9 +69,104 @@ const fetchAevo = async (page, limit, time, keyword) => {
     }
 };
 
+const fetchHyperliquid = async (page, limit, time, keyword) => {
+    const token = getCookie('token'); // Ambil token dari cookie
+
+    try {
+        const response = await fetch(API_CONFIG.endpoints.hyperliquid(page, limit, time, keyword), {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}` // Menambahkan token pada header
+            },
+        });
+
+        if (!response.ok) {
+            return response.json();
+        }
+        
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        return error;
+    }
+};
+
+const fetchBybit = async (page, limit, time, keyword) => {
+    const token = getCookie('token'); // Ambil token dari cookie
+
+    try {
+        const response = await fetch(API_CONFIG.endpoints.bybit(page, limit, time, keyword), {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}` // Menambahkan token pada header
+            },
+        });
+
+        if (!response.ok) {
+            return response.json();
+        }
+        
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        return error;
+    }
+};
+
+const fetchGateio = async (page, limit, time, keyword) => {
+    const token = getCookie('token'); // Ambil token dari cookie
+
+    try {
+        const response = await fetch(API_CONFIG.endpoints.gateio(page, limit, time, keyword), {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}` // Menambahkan token pada header
+            },
+        });
+
+        if (!response.ok) {
+            return response.json();
+        }
+        
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        return error;
+    }
+};
+
+const fetchTickers = async (page, limit, time, keyword) => {
+    const token = getCookie('token'); // Ambil token dari cookie
+
+    try {
+        const response = await fetch(API_CONFIG.endpoints.tickers(page, limit, time, keyword), {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}` // Menambahkan token pada header
+            },
+        });
+
+        if (!response.ok) {
+            return response.json();
+        }
+        
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        return error;
+    }
+};
+
 export {
-    fetchData,
     login,
     register,
     fetchAevo,
+    fetchHyperliquid,
+    fetchGateio,
+    fetchBybit,
+    fetchTickers,
 };

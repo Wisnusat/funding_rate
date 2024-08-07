@@ -41,7 +41,6 @@
             
             const username = document.getElementById('username').value;
             const password = document.getElementById('password').value;
-            
             const response = await login(username, password);
             
             if (response && response.token) {

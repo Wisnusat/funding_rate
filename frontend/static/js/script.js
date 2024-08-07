@@ -1,4 +1,10 @@
-import { fetchAevo } from "../../config/apiService.js";
+import {
+    fetchAevo,
+    fetchGateio,
+    fetchHyperliquid,
+    fetchTickers,
+    fetchBybit,
+} from "../../config/apiService.js";
 
 const loadingSpinner = document.getElementById('loadingSpinner');
 const CHEVRON_GREEN = '/frontend/assets/icon/chevron-green.png';
@@ -7,9 +13,18 @@ const tableBody = document.getElementById('coinTableBody');
 const refreshButton = document.querySelector('.refresh-button');
 const searchBarMobile = document.getElementById('searchBarMobile');
 const searchBarDesktop = document.getElementById('searchBarDesktop');
+const timeFilters = document.querySelectorAll('.time-filter');
+const hamburgerMenu = document.getElementById('hamburger-menu');
+const drawer = document.getElementById('drawer');
+const overlay = document.getElementById('overlay');
+const closeDrawerButton = document.getElementById('close-drawer');
+const logoutLink = document.getElementById('logoutLink');
 
 let currentTimeFilter = '1h'; // Default time filter
 let searchQuery = ''; // Default search query
+let currentPage = 1;
+const limitPerPage = 20;
+let isFetching = false;
 
 const formatToFiveDecimalPlaces = (numberString) => {
     const number = parseFloat(numberString);
@@ -21,30 +36,40 @@ const formatToFiveDecimalPlaces = (numberString) => {
 };
 
 const renderFundRate = (rate) => {
-    const icon = rate.includes('-') ? CHEVRON_RED : CHEVRON_GREEN;
-    return `<img src="/frontend/assets/icon/loading-placeholder.png" data-src="${icon}" alt="${rate.includes('-') ? 'Down' : 'Up'}" class="chevron-icon lazy"> ${formatToFiveDecimalPlaces(rate)}`;
+    if (rate !== 'None') {
+        const icon = rate.includes('-') ? CHEVRON_RED : CHEVRON_GREEN;
+        return `<img src="/frontend/assets/icon/loading-placeholder.png" data-src="${icon}" alt="${rate.includes('-') ? 'Down' : 'Up'}" class="chevron-icon lazy"> ${formatToFiveDecimalPlaces(rate)}`;
+    }
+    return '-';
 };
 
-const renderTableRow = (coin, index) => {
-    const up = "0.65";
-    const down = "-0.65";
+const calculateAverage = (values) => {
+    const validValues = values.filter(value => value !== 'None').map(parseFloat);
+    if (validValues.length === 0) return 'None';
+    const sum = validValues.reduce((acc, value) => acc + value, 0);
+    return (sum / validValues.length).toFixed(5);
+};
+
+const renderTableRow = (coin, aevo, hyperliquid, bybit) => {
+    const average = calculateAverage([aevo, bybit, hyperliquid]);
+
     return `
         <tr onclick="window.location.href='/frontend/detail.html?coin=${coin.coin}&logo=${coin.logo}'" style="cursor:pointer;">
             <td class="sticky-col">
                 <img src="/frontend/assets/icon/loading-placeholder.png" data-src="${coin.logo}" class="coin-logo lazy">
                 ${coin.coin}
             </td>
-            <td class="${down.includes('-') ? 'down' : 'up'}">${renderFundRate("-0.65")}</td>
-            <td class="${coin.rate.includes('-') ? 'down' : 'up'}">${renderFundRate(coin.rate)}</td>
-            <td class="${up.includes('-') ? 'down' : 'up'}">${renderFundRate("0.65")}</td>
-            <td class="${down.includes('-') ? 'down' : 'up'}">${renderFundRate("-0.65")}</td>
-            <td class="${up.includes('-') ? 'down' : 'up'}">${renderFundRate("0.65")}</td>
+            <td class="${average !== 'None' && average.includes('-') ? 'down' : average !== 'None' ? 'up' : ''}">${renderFundRate(average)}</td>
+            <td class="${aevo !== 'None' && aevo.includes('-') ? 'down' : 'up'}">${renderFundRate(aevo)}</td>
+            <td class="${bybit !== 'None' && bybit.includes('-') ? 'down' : 'up'}">${renderFundRate(bybit)}</td>
+            <td class="${"-0.65".includes('-') ? 'down' : 'up'}">${renderFundRate("-0.65")}</td>
+            <td class="${hyperliquid !== 'None' && hyperliquid.includes('-') ? 'down' : 'up'}">${renderFundRate(hyperliquid)}</td>
         </tr>
     `;
 };
 
-const renderTable = (data, startIndex) => {
-    tableBody.innerHTML += data.map((coin, index) => renderTableRow(coin, startIndex + index)).join('');
+const renderTable = (data, aevo, hyperliquid, bybit) => {
+    tableBody.innerHTML += data.map((coin, index) => renderTableRow(coin, aevo[index], hyperliquid[index], bybit[index])).join('');
     lazyLoadImages(); // Lazy load images after rendering new data
 };
 
@@ -88,46 +113,63 @@ const logout = (event) => {
     window.location.href = '/frontend/login.html'; // Redirect to the login page
 };
 
-// Setup time filter buttons
-const timeFilters = document.querySelectorAll('.time-filter');
-timeFilters.forEach(button => button.addEventListener('click', () => {
-    toggleActiveClass(timeFilters, button);
-    currentTimeFilter = button.textContent.toLocaleLowerCase(); // Update current time filter
-    refreshData(); // Refresh data when the time filter is changed
-}));
+const setupEventListeners = () => {
+    timeFilters.forEach(button => button.addEventListener('click', () => {
+        toggleActiveClass(timeFilters, button);
+        currentTimeFilter = button.textContent.toLocaleLowerCase(); // Update current time filter
+        refreshData(); // Refresh data when the time filter is changed
+    }));
 
-// Setup drawer menu
-const hamburgerMenu = document.getElementById('hamburger-menu');
-const drawer = document.getElementById('drawer');
-const overlay = document.getElementById('overlay');
-const closeDrawerButton = document.getElementById('close-drawer');
-hamburgerMenu.addEventListener('click', openDrawer);
-closeDrawerButton.addEventListener('click', closeDrawerAndOverlay);
-overlay.addEventListener('click', closeDrawerAndOverlay);
+    hamburgerMenu.addEventListener('click', openDrawer);
+    closeDrawerButton.addEventListener('click', closeDrawerAndOverlay);
+    overlay.addEventListener('click', closeDrawerAndOverlay);
+    logoutLink.addEventListener('click', logout);
 
-// Setup logout link
-document.getElementById('logoutLink').addEventListener('click', logout);
+    searchBarMobile.addEventListener('input', () => {
+        debounce(() => {
+            searchQuery = searchBarMobile.value;
+            refreshData(); // Refresh data when the search query changes
+        }, 300); // Debounce delay of 300ms
+    });
 
-// Infinite scroll logic
-let currentPage = 1;
-const limitPerPage = 20;
-let isFetching = false;
-let allCoinData = []; // Array to store all coin data
+    searchBarDesktop.addEventListener('input', () => {
+        debounce(() => {
+            searchQuery = searchBarDesktop.value;
+            refreshData(); // Refresh data when the search query changes
+        }, 300); // Debounce delay of 300ms
+    });
+
+    refreshButton.addEventListener('click', refreshData);
+};
 
 const fetchAndRenderCoinData = async () => {
-    console.log("Fetching data with:", { currentPage, limitPerPage, currentTimeFilter, searchQuery }); // Debugging log
     if (isFetching) return;
     isFetching = true;
     loadingSpinner.style.display = 'block'; // Show the loading spinner
-    const data = await fetchAevo(currentPage, limitPerPage, currentTimeFilter, searchQuery); // Pass the time filter and search query as arguments
-    loadingSpinner.style.display = 'none'; // Hide the loading spinner
-    if (data && data.data && data.data.length > 0) {
-        allCoinData = data.data; // Concatenate new data with old data
-        renderTable(data.data, (currentPage - 1) * limitPerPage);
-        currentPage++;
-        repositionSentinel();
+
+    try {
+        // Fetch all data concurrently
+        const [data, aevo, hyperliquid, bybit] = await Promise.all([
+            fetchTickers(currentPage, limitPerPage, currentTimeFilter, searchQuery),
+            fetchAevo(currentPage, limitPerPage, currentTimeFilter, searchQuery),
+            fetchHyperliquid(currentPage, limitPerPage, currentTimeFilter, searchQuery),
+            fetchBybit(currentPage, limitPerPage, currentTimeFilter, searchQuery)
+        ]);
+
+        loadingSpinner.style.display = 'none'; // Hide the loading spinner
+
+        // Check if data exists and render the table
+        if (data && data.data && data.data.length > 0) {
+            renderTable(data.data, aevo.data, hyperliquid.data, bybit.data);
+            currentPage++;
+            repositionSentinel();
+        }
+    } catch (error) {
+        console.error("Error fetching data:", error);
+        loadingSpinner.style.display = 'none'; // Hide the loading spinner in case of error
+    } finally {
+        isFetching = false;
     }
-    isFetching = false;
 };
 
 const repositionSentinel = () => {
@@ -183,31 +225,13 @@ const observer = new IntersectionObserver(async (entries) => {
 }, observerOptions);
 
 const refreshData = () => {
-    console.log("Refreshing data..."); // Debugging log
     currentPage = 1;
-    allCoinData = [];
     tableBody.innerHTML = '';
     fetchAndRenderCoinData();
 };
 
-refreshButton.addEventListener('click', refreshData);
-
-// Event listener for search bar
-searchBarMobile.addEventListener('input', () => {
-    debounce(() => {
-        searchQuery = searchBarMobile.value;
-        refreshData(); // Refresh data when the search query changes
-    }, 300); // Debounce delay of 300ms
-});
-
-searchBarDesktop.addEventListener('input', () => {
-    debounce(() => {
-        searchQuery = searchBarDesktop.value;
-        refreshData(); // Refresh data when the search query changes
-    }, 300); // Debounce delay of 300ms
-});
-
 document.addEventListener("DOMContentLoaded", () => {
     displayUsername();
+    setupEventListeners();
     fetchAndRenderCoinData();
 });
