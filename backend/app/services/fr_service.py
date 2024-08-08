@@ -48,10 +48,12 @@ class FrService:
         tickers_paginated = tickers[start:end]
 
         for ticker_name in tickers_paginated:
+            logo, name = get_logo_url(ticker_name.split('/')[0])
             data_per_ticker = {
                 "coin": ticker_name.split('-')[0],
                 "badge": ticker_name,
-                "logo": get_logo_url(ticker_name.split('-')[0]),
+                "logo": logo,
+                "name": name
             }
             
             res['data'].append(data_per_ticker)

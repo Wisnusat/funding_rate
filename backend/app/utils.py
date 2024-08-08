@@ -37,6 +37,6 @@ def get_logo_url(symbol, file_path='data_const/crypto_logos.json'):
     if coin:
         # Construct the logo URL
         logo_url = f"https://cryptologos.cc/logos/{coin['name'].lower().replace(' ', '-')}-{symbol.lower()}-logo.png"
-        return logo_url
+        return logo_url, coin['name']
     
-    return None
+    return None, None
