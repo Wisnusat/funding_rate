@@ -1,8 +1,7 @@
-const baseUrl =  'https://deep-flss-suryalab-9cf66ab5.koyeb.app';
+const baseUrl = 'https://1771-2001-448a-50e1-a0-edbb-bbac-cd34-f4c3.ngrok-free.app';
 
 export const API_CONFIG = {
     endpoints: {
-        coinData: '/api/coins',
         auth: `${baseUrl}/api/auth/`,
         register: `${baseUrl}/api/user/`,
         aevo: (page, limit, time, keyword) => `${baseUrl}/api/funding-rates/aevo?page=${page}&limit=${limit}&time=${time}&keyword=${keyword}`,

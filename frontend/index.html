@@ -89,11 +89,13 @@
                 <table id="coinTable">
                     <thead>
                         <tr>
-                            <th class="sticky-header" data-sort="coin">
-                                <div class="column">
-                                    Coin
-                                    <img src="/frontend/assets/icon/ascdesc.png" width="8" height="16" class="sort-icon"
-                                        data-sort="coin" />
+                            <th class="sticky-header">
+                                <div class="sortable" data-sort="coin">
+                                    <div class="column">
+                                        Coin
+                                        <img src="/frontend/assets/icon/ascdesc.png" width="8" height="16"
+                                            class="sort-icon" data-sort="coin" />
+                                    </div>
                                 </div>
                             </th>
                             <th class="sortable" data-sort="average">
@@ -132,7 +134,7 @@
             <div id="loadingSpinner" class="spinner" style="display: none;"></div>
         </main>
         <footer class="footer">
-            <p>Current UTC Time: 06:51</p>
+            <p>Current UTC Time: <span id="currentLocalTime"></span></p>
         </footer>
     </div>
     <script src="/frontend/static/js/script.js" type="module"></script>

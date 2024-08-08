@@ -25,6 +25,7 @@ let searchQuery = ''; // Default search query
 let currentPage = 1;
 const limitPerPage = 20;
 let isFetching = false;
+let allCoinData = []; // Store all fetched data
 
 const formatToFiveDecimalPlaces = (numberString) => {
     const number = parseFloat(numberString);
@@ -50,9 +51,7 @@ const calculateAverage = (values) => {
     return (sum / validValues.length).toFixed(5);
 };
 
-const renderTableRow = (coin, aevo, hyperliquid, bybit) => {
-    const average = calculateAverage([aevo, bybit, hyperliquid]);
-
+const renderTableRow = (coin, aevo, hyperliquid, bybit, gateio, average) => {
     return `
         <tr onclick="window.location.href='/frontend/detail.html?coin=${coin.coin}&logo=${coin.logo}'" style="cursor:pointer;">
             <td class="sticky-col">
@@ -60,17 +59,18 @@ const renderTableRow = (coin, aevo, hyperliquid, bybit) => {
                 ${coin.coin}
             </td>
             <td class="${average !== 'None' && average.includes('-') ? 'down' : average !== 'None' ? 'up' : ''}">${renderFundRate(average)}</td>
-            <td class="${aevo !== 'None' && aevo.includes('-') ? 'down' : 'up'}">${renderFundRate(aevo)}</td>
-            <td class="${bybit !== 'None' && bybit.includes('-') ? 'down' : 'up'}">${renderFundRate(bybit)}</td>
-            <td class="${"-0.65".includes('-') ? 'down' : 'up'}">${renderFundRate("-0.65")}</td>
-            <td class="${hyperliquid !== 'None' && hyperliquid.includes('-') ? 'down' : 'up'}">${renderFundRate(hyperliquid)}</td>
+            <td class="${aevo !== 'None' && aevo.includes('-') ? 'down' : aevo !== 'None' ? 'up' : ''}">${renderFundRate(aevo)}</td>
+            <td class="${bybit !== 'None' && bybit.includes('-') ? 'down' : bybit !== 'None' ? 'up' : ''}">${renderFundRate(bybit)}</td>
+            <td class="${gateio !== 'None' && gateio.includes('-') ? 'down' : gateio !== 'None' ? 'up' : ''}">${renderFundRate(gateio)}</td>
+            <td class="${hyperliquid !== 'None' && hyperliquid.includes('-') ? 'down' : hyperliquid !== 'None' ? 'up' : ''}">${renderFundRate(hyperliquid)}</td>
         </tr>
     `;
 };
 
-const renderTable = (data, aevo, hyperliquid, bybit) => {
-    tableBody.innerHTML += data.map((coin, index) => renderTableRow(coin, aevo[index], hyperliquid[index], bybit[index])).join('');
+const renderTable = (data) => {
+    tableBody.innerHTML = data.map(({coin, aevo, hyperliquid, bybit, gateio, average}) => renderTableRow(coin, aevo, hyperliquid, bybit, gateio, average)).join('');
     lazyLoadImages(); // Lazy load images after rendering new data
+    repositionSentinel(); // Ensure the sentinel is correctly positioned
 };
 
 const toggleActiveClass = (buttons, activeButton) => {
@@ -128,14 +128,14 @@ const setupEventListeners = () => {
     searchBarMobile.addEventListener('input', () => {
         debounce(() => {
             searchQuery = searchBarMobile.value;
-            refreshData(); // Refresh data when the search query changes
+            filterAndRenderData(); // Filter and render data when the search query changes
         }, 300); // Debounce delay of 300ms
     });
 
     searchBarDesktop.addEventListener('input', () => {
         debounce(() => {
             searchQuery = searchBarDesktop.value;
-            refreshData(); // Refresh data when the search query changes
+            filterAndRenderData(); // Filter and render data when the search query changes
         }, 300); // Debounce delay of 300ms
     });
 
@@ -149,21 +149,39 @@ const fetchAndRenderCoinData = async () => {
 
     try {
         // Fetch all data concurrently
-        const [data, aevo, hyperliquid, bybit] = await Promise.all([
+        const [data, aevo, hyperliquid, bybit, gateio] = await Promise.all([
             fetchTickers(currentPage, limitPerPage, currentTimeFilter, searchQuery),
             fetchAevo(currentPage, limitPerPage, currentTimeFilter, searchQuery),
             fetchHyperliquid(currentPage, limitPerPage, currentTimeFilter, searchQuery),
-            fetchBybit(currentPage, limitPerPage, currentTimeFilter, searchQuery)
+            fetchBybit(currentPage, limitPerPage, currentTimeFilter, searchQuery),
+            fetchGateio(currentPage, limitPerPage, currentTimeFilter, searchQuery),
         ]);
 
         loadingSpinner.style.display = 'none'; // Hide the loading spinner
 
-        // Check if data exists and render the table
-        if (data && data.data && data.data.length > 0) {
-            renderTable(data.data, aevo.data, hyperliquid.data, bybit.data);
-            currentPage++;
-            repositionSentinel();
-        }
+        // Concatenate the new data with the existing data
+        const newCoinData = data.data.map((coin, index) => {
+            const aevoValue = aevo.data[index];
+            const hyperliquidValue = hyperliquid.data[index];
+            const bybitValue = bybit.data[index];
+            const gateioValue = gateio.data[index];
+            const average = calculateAverage([aevoValue, hyperliquidValue, bybitValue, gateioValue]);
+
+            return {
+                coin,
+                aevo: aevoValue,
+                hyperliquid: hyperliquidValue,
+                bybit: bybitValue,
+                gateio: gateioValue,
+                average
+            };
+        });
+
+        allCoinData = allCoinData.concat(newCoinData);
+
+        // Render the table with the updated data
+        sortAndRenderData(); // Ensure the data is sorted before rendering
+        currentPage++;
     } catch (error) {
         console.error("Error fetching data:", error);
         loadingSpinner.style.display = 'none'; // Hide the loading spinner in case of error
@@ -226,12 +244,87 @@ const observer = new IntersectionObserver(async (entries) => {
 
 const refreshData = () => {
     currentPage = 1;
+    allCoinData = []; // Clear existing data
     tableBody.innerHTML = '';
     fetchAndRenderCoinData();
 };
 
+// Function to filter and render data based on search query
+const filterAndRenderData = () => {
+    const filteredData = allCoinData.filter(({ coin }) => coin.coin.toLowerCase().includes(searchQuery.toLowerCase()));
+    renderTable(filteredData);
+};
+
+// Global variable to track sort state
+let sortState = {
+    column: 'coin',
+    order: 'asc'
+};
+
+// Function to compare values for sorting
+const compareValues = (key, order = 'asc') => {
+    return function(a, b) {
+        const aValue = key === 'average' ? parseFloat(a[key]) : (key === 'coin' ? a.coin[key] : parseFloat(a[key]));
+        const bValue = key === 'average' ? parseFloat(b[key]) : (key === 'coin' ? b.coin[key] : parseFloat(b[key]));
+
+        let comparison = 0;
+        if (aValue > bValue) comparison = 1;
+        else if (aValue < bValue) comparison = -1;
+
+        return (order === 'desc') ? (comparison * -1) : comparison;
+    };
+};
+
+// Function to sort data and render table
+const sortAndRenderData = () => {
+    const sortedData = [...allCoinData].sort(compareValues(sortState.column, sortState.order));
+    renderTable(sortedData);
+};
+
+// Event listeners for sorting
+const setupSortEventListeners = () => {
+    const sortableHeaders = document.querySelectorAll('.sortable');
+    sortableHeaders.forEach(header => {
+        header.addEventListener('click', () => {
+            const column = header.dataset.sort;
+            if (sortState.column === column) {
+                sortState.order = sortState.order === 'asc' ? 'desc' : 'asc';
+            } else {
+                sortState.column = column;
+                sortState.order = 'asc';
+            }
+            sortAndRenderData(); // Sort and render data with the new sort state
+        });
+    });
+};
+
+// Function to update the current local time in the footer
+const updateLocalTime = () => {
+    const localTimeElement = document.getElementById('currentLocalTime');
+    if (localTimeElement) {
+        const now = new Date();
+        const hours = now.getHours().toString().padStart(2, '0');
+        const minutes = now.getMinutes().toString().padStart(2, '0');
+        const seconds = now.getSeconds().toString().padStart(2, '0');
+        localTimeElement.textContent = `${hours}:${minutes}:${seconds}`;
+    }
+};
+
+// Call the function to set the initial time
+updateLocalTime();
+
+// Update the time every second
+setInterval(updateLocalTime, 1000);
+
 document.addEventListener("DOMContentLoaded", () => {
     displayUsername();
     setupEventListeners();
+    setupSortEventListeners();
     fetchAndRenderCoinData();
+    repositionSentinel(); // Initialize sentinel
+
+    // Initial call to update the time
+    updateLocalTime();
+    // Set interval to update the time every second
+    setInterval(updateLocalTime, 1000);
 });
