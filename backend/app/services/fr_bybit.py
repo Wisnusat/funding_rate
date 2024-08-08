@@ -48,7 +48,7 @@ class Bybit:
         tickers_paginated = tickers[start:end]
 
         for ticker_name in tickers_paginated:
-            ticker_name = f"{ticker_name}/USDC:USDC"
+            ticker_name = f"{ticker_name}/USDT:USDT"
             funding_history = FrService.fetchFundingWithCCXT('bybit', ticker_name, time)
             # data_per_ticker = {
             #     "coin": ticker_name.split('/')[0],
