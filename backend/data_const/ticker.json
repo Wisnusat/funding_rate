@@ -1,13 +1,11 @@
 [
-    "10000SATS", "1000BONK", "1000PEPE", "AEVO", "ALT", "APT",
-    "AR", "ARB", "ATOM", "AVAX", "AXL", "BEAMX", "BITCOIN",
-    "BLAST", "BLUR", "BLZ", "BNB", "BTC", "CANTO", "CRV",
-    "DOGE", "DYDX", "DYM", "ENA", "ETH", "ETHFI", "FTM",
-    "GLMR", "HIFI", "HPOS", "ILV", "INJ", "JITO", "JUP",
-    "LDO", "LINK", "MANTA", "MATIC", "MEME", "MERL", "MINA",
-    "MKR", "MYRO", "NEAR", "NMR", "NTRN", "OMNI", "OP",
-    "ORDI", "OX", "PARCL", "PENDLE", "PIXEL", "PORTAL", "PRIME",
-    "PYTH", "SAGA", "SEI", "SHFL", "SLERF", "SOL", "STRK",
-    "SUI", "SYN", "T", "TAO", "TIA", "TNSR", "TON", "TRB",
-    "TRX", "UMA", "W", "WIF", "WLD", "XRP", "ZERO", "ZETA"
-]
+    "BTC", "ETH", "USDT", "BNB", "SOL", "XRP", "USDC", "DOGE", "TON", "ADA", "AVAX",
+    "SHIB", "BCH", "DOT", "TRX", "LINK", "MATIC", "NEAR", "ICP", "LTC", "UNI", "LEO",
+    "DAI", "APT", "ETC", "STX", "FIL", "MNT", "ATOM", "TAO", "ARB", "CRO", "IMX",
+    "XLM", "HBAR", "WIF", "OKB", "FDUSD", "VET", "KAS", "MKR", "GRT", "INJ", "OP",
+    "PEPE", "FTM", "THETA", "RUNE", "XMR", "LDO", "FET", "CORE", "AR", "TIA", "SUI",
+    "AAVE", "FLOKI", "ALGO", "FLOW", "BSV", "SEI", "GALA", "BGB", "JUP", "PENDLE",
+    "CKB", "W", "FLR", "BONK", "EGLD", "NEO", "AXS", "QNT", "XEC", "SAND", "STRK",
+    "AGIX", "SNX", "CFX", "XTZ", "WLD", "EOS", "RON", "MANA", "PYTH", "MINA", "ONDO",
+    "KAVA", "APE", "KCS", "JASMY", "IOTA", "AKT", "CAKE", "GNO", "HNT", "KLAY", "ROSE"
+]   
