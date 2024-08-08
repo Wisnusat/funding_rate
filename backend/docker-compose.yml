@@ -10,9 +10,12 @@ services:
     environment:
       FLASK_ENV: development
       SECRET_KEY: your_secret_key
-      DATABASE_URL: postgresql://admindev:admindev@localhost:5432/jp_funding_rate
+      DATABASE_URL: postgresql://admindev:admindev@db:5432/jp_funding_rate
     depends_on:
       - db
+    dns:
+      - 1.1.1.1
+      - 1.0.0.1
 
   db:
     image: postgres:13
@@ -24,6 +27,9 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    dns:
+      - 1.1.1.1
+      - 1.0.0.1
 
 volumes:
   postgres_data:
