@@ -132,3 +132,13 @@ python -m unittest discover tests
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
 
 ```
+
+# SETUP AUTOMATICALLY
+```
+chmod +x setup.sh
+```
+
+Run the Script:
+```
+./setup.sh
+```
