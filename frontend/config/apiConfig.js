@@ -1,4 +1,4 @@
-const baseUrl = 'https://40a4-2a09-bac5-3a1a-18d2-00-279-77.ngrok-free.app';
+const baseUrl = 'http://127.0.0.1:5000';
 
 export const API_CONFIG = {
     endpoints: {
@@ -9,6 +9,7 @@ export const API_CONFIG = {
         bybit: (page, limit, time, keyword) => `${baseUrl}/api/funding-rates/bybit?page=${page}&limit=${limit}&time=${time}&keyword=${keyword}`,
         gateio: (page, limit, time, keyword) => `${baseUrl}/api/funding-rates/gateio?page=${page}&limit=${limit}&time=${time}&keyword=${keyword}`,
         tickers: (page, limit, time, keyword) => `${baseUrl}/api/funding-rates/tickers?page=${page}&limit=${limit}&time=${time}&keyword=${keyword}`,
+        detailCoin: (coin) => `https://api.coingecko.com/api/v3/coins/${coin}`,
         // Add other endpoints as needed
     }
 };

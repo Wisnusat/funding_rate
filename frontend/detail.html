@@ -16,7 +16,7 @@
                 <img id="crypto-logo" src="https://cryptologos.cc/logos/bitcoin-btc-logo.png" alt="Crypto Logo" class="crypto-logo">
                 <div class="crypto-details">
                     <h1 id="crypto-title">Bitcoin</h1>
-                    <p class="price">$58,114.68</p>
+                    <p id="price"></p>
                 </div>
             </div>
         </div>
@@ -29,17 +29,18 @@
             <div class="details-section">
                 <h2>Detail</h2>
                 <ul>
-                    <li>Price <span>$53,066,292.26</span></li>
-                    <li>Market Cap <span class="down">-$6,827,829.90 <span class="percentage">▼ 11.40%</span></span></li>
-                    <li>Volume <span>$50,238,608.36 / $59,738,211.19</span></li>
-                    <li>Volume / Market Cap <span class="down">$117 <span class="percentage">▼ 15.34%</span></span></li>
-                    <li>Circulating Supply <span>62.00%</span></li>
-                    <li>Total Supply <span>$1,000,000</span></li>
+                    <li>Market Cap Rank <span id="market-cap-rank"></span></li>
+                    <li>Market Cap <span id="market-cap"></span></li>
+                    <li>Volume <span id="volume"></span></li>
+                    <li>Circulating Supply <span id="circulating-supply"></span></li>
+                    <li>Total Supply <span id="total-supply"></span></li>
+                    <li>All-Time High <span id="ath"></span></li>
+                    <li>All-Time Low <span id="atl"></span></li>
                 </ul>
             </div>
         </div>
     </div>
-    <script src="/frontend/static/js/detail.js"></script>
+    <script type="module" src="/frontend/static/js/detail.js"></script>
     <script src="/frontend/static/js/auth.js"></script>
 </body>
 </html>

@@ -161,6 +161,28 @@ const fetchTickers = async (page, limit, time, keyword) => {
     }
 };
 
+const fetchDetailCoin = async (coin) => {
+    try {
+        const response = await fetch(API_CONFIG.endpoints.detailCoin(coin), {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(`Error fetching data: ${response.status} ${response.statusText}`, errorData);
+        }
+
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error('Error fetching coin details:', error);
+        return { error: true, message: error.message };
+    }
+};
+
 export {
     login,
     register,
@@ -169,4 +191,5 @@ export {
     fetchGateio,
     fetchBybit,
     fetchTickers,
+    fetchDetailCoin,
 };
