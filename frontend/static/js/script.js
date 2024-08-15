@@ -19,6 +19,7 @@ const drawer = document.getElementById('drawer');
 const overlay = document.getElementById('overlay');
 const closeDrawerButton = document.getElementById('close-drawer');
 const logoutLink = document.getElementById('logoutLink');
+const coinDropdown = document.getElementById('coin');
 
 let currentTimeFilter = '1h'; // Default time filter
 let searchQuery = ''; // Default search query
@@ -327,4 +328,118 @@ document.addEventListener("DOMContentLoaded", () => {
     updateLocalTime();
     // Set interval to update the time every second
     setInterval(updateLocalTime, 1000);
+});
+
+// Modal Logic
+
+// Get the modal
+const modal = document.getElementById("arbitrageModal");
+
+// Get the button that opens the modal
+const btn = document.getElementById("arbitrageTrigger");
+
+// Get the <span> element that closes the modal
+const span = document.getElementsByClassName("close")[0];
+
+// When the user clicks the button, open the modal
+btn.onclick = function() {
+    fetchCoinDataForModal();
+    modal.classList.add("show");
+    setTimeout(() => modal.style.display = "block", 50); // Slight delay to allow transition
+}
+
+// When the user clicks on <span> (x), close the modal
+span.onclick = function() {
+    modal.classList.remove("show");
+    setTimeout(() => modal.style.display = "none", 300); // Delay hiding the modal until transition ends
+    document.getElementById('amount').value = "";
+}
+
+// When the user clicks anywhere outside of the modal, close it
+window.onclick = function(event) {
+    if (event.target == modal) {
+        modal.classList.remove("show");
+        setTimeout(() => modal.style.display = "none", 300); // Delay hiding the modal until transition ends
+        document.getElementById('amount').value = "";
+    }
+}
+
+
+const populateCoinDropdown = (coins) => {
+    const coinOptions = coins.map(coin => ({
+        id: coin.coin,
+        text: `${coin.coin}`,
+        logo: coin.logo
+    }));
+
+    // Clear existing options
+    coinDropdown.innerHTML = '';
+
+    // Populate the dropdown manually
+    coinOptions.forEach(option => {
+        const opt = document.createElement('option');
+        opt.value = option.id;
+        opt.text = option.text;
+        opt.dataset.logo = option.logo; // Store logo URL as a data attribute
+        coinDropdown.appendChild(opt);
+    });
+};
+
+const fetchCoinDataForModal = async () => {
+    try {
+        const data = await fetchTickers(1, 100, currentTimeFilter, '');
+        populateCoinDropdown(data.data);
+    } catch (error) {
+        console.error("Error fetching coin data:", error);
+    }
+};
+
+// Arbitrage Calculation Logic
+document.getElementById('arbitrageForm').addEventListener('submit', async function(event) {
+    event.preventDefault();
+
+    const exchangeA = document.getElementById('exchangeA').value;
+    const exchangeB = document.getElementById('exchangeB').value;
+    const coin = document.getElementById('coin').value;
+    const amount = parseFloat(document.getElementById('amount').value);
+
+    async function getFundingRate(exchange, coin) {
+        if (exchange === "aevo") {
+            const fundingRate = await fetchAevo(1, limitPerPage, currentTimeFilter, coin);
+            if (fundingRate.data[0] !== "None") {
+                return fundingRate.data[0];
+            } else {
+                return 0;
+            }
+        } else if (exchange === "hyperliquid") {
+            const fundingRate = await fetchHyperliquid(1, limitPerPage, currentTimeFilter, coin);
+            if (fundingRate.data[0] !== "None") {
+                return fundingRate.data[0];
+            } else {
+                return 0;
+            }
+        } else if (exchange === "bybit") {
+            const fundingRate = await fetchBybit(1, limitPerPage, currentTimeFilter, coin);
+            if (fundingRate.data[0] !== "None") {
+                return fundingRate.data[0];
+            } else {
+                return 0;
+            }
+        } else if (exchange === "gateio") {
+            const fundingRate = await fetchGateio(1, limitPerPage, currentTimeFilter, coin);
+            if (fundingRate.data[0] !== "None") {
+                return fundingRate.data[0];
+            } else {
+                return 0;
+            }
+        }
+    }
+
+    const fundingRateA = await getFundingRate(exchangeA, coin);
+    const fundingRateB = await getFundingRate(exchangeB, coin);
+
+    const cumulativeFundingRate = parseFloat(fundingRateA) + parseFloat(fundingRateB);
+    const result = cumulativeFundingRate * amount;
+
+    document.getElementById('result').innerText = `Estimated Arbitrage Profit: $${result.toFixed(2)}`;
 });

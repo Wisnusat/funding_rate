@@ -75,6 +75,7 @@
         <div class="filter">
             <div class="button-container">
                 <button class="refresh-button">Refresh</button>
+                <button id="arbitrageTrigger" class="arbitrage-button">Arbitrage</button>
             </div>
             <div class="time-filters">
                 <button class="time-filter active">1H</button>
@@ -137,6 +138,54 @@
             <p>Current UTC Time: <span id="currentLocalTime"></span></p>
         </footer>
     </div>
+
+    <!-- Modal for Arbitrage Calculator -->
+    <div id="arbitrageModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h1 class="arbitrage-title">Arbitrage Calculator</h1>
+            <form id="arbitrageForm">
+                <div class="input-group">
+                    <label for="exchangeA">Exchange A:</label>
+                    <select id="exchangeA" name="exchangeA" required>
+                        <option value="aevo">Aevo</option>
+                        <option value="bybit">Bybit</option>
+                        <option value="gateio">Gate.io</option>
+                        <option value="hyperliquid">Hyperliquid</option>
+                    </select>
+                </div>
+
+                <div class="input-group">
+                    <label for="exchangeB">Exchange B:</label>
+                    <select id="exchangeB" name="exchangeB" required>
+                        <option value="aevo">Aevo</option>
+                        <option value="bybit">Bybit</option>
+                        <option value="gateio">Gate.io</option>
+                        <option value="hyperliquid">Hyperliquid</option>
+                    </select>
+                </div>
+
+                <div class="input-group">
+                    <label for="coin">Coin:</label>
+                    <select id="coin" name="coin" required>
+                        <!-- Add more coins as needed -->
+                    </select>
+                </div>
+
+                <div class="input-group">
+                    <label for="amount">Investment Amount:</label>
+                    <input type="number" id="amount" name="amount" placeholder="Enter amount" required>
+                </div>
+
+                <button type="submit" class="calculate-button">Calculate Arbitrage</button>
+            </form>
+
+            <div id="result" class="result">
+                <!-- The arbitrage calculation result will be displayed here -->
+            </div>
+        </div>
+    </div>
+
     <script src="/frontend/static/js/script.js" type="module"></script>
     <script src="/frontend/static/js/auth.js"></script>
 </body>
