@@ -6,6 +6,7 @@ import {
     fetchBybit,
 } from "../../config/apiService.js";
 
+const loadingContainer = document.getElementById('loadingContainer');
 const loadingSpinner = document.getElementById('loadingSpinner');
 const CHEVRON_GREEN = '/frontend/assets/icon/chevron-green.png';
 const CHEVRON_RED = '/frontend/assets/icon/chevron-red.png';
@@ -27,6 +28,7 @@ let currentPage = 1;
 const limitPerPage = 20;
 let isFetching = false;
 let allCoinData = []; // Store all fetched data
+let isNextPageAvailable = true; // Flag to check if there are more pages to fetch
 
 const formatToFiveDecimalPlaces = (numberString) => {
     const number = parseFloat(numberString);
@@ -143,51 +145,77 @@ const setupEventListeners = () => {
     refreshButton.addEventListener('click', refreshData);
 };
 
+const fetchDataAndRenderCoin = async (fetchFunction, coinData, exchangeName) => {
+    try {
+        const fetchedData = await fetchFunction(currentPage, limitPerPage, currentTimeFilter, searchQuery);
+        fetchedData.data.forEach((rate, index) => {
+            coinData[index][exchangeName] = rate !== "None" ? rate : 'None';
+        });
+    } catch (error) {
+        console.error(`Error fetching data from ${exchangeName}:`, error);
+        coinData.forEach(data => data[exchangeName] = 'None');
+    }
+
+    // After fetching data from this exchange, render the table
+    renderTable(coinData);
+};
+
 const fetchAndRenderCoinData = async () => {
-    if (isFetching) return;
+    if (isFetching || !isNextPageAvailable) return;
     isFetching = true;
     loadingSpinner.style.display = 'block'; // Show the loading spinner
+    loadingContainer.style.visibility = 'visible';
 
     try {
-        // Fetch all data concurrently
-        const [data, aevo, hyperliquid, bybit, gateio] = await Promise.all([
-            fetchTickers(currentPage, limitPerPage, currentTimeFilter, searchQuery),
-            fetchAevo(currentPage, limitPerPage, currentTimeFilter, searchQuery),
-            fetchHyperliquid(currentPage, limitPerPage, currentTimeFilter, searchQuery),
-            fetchBybit(currentPage, limitPerPage, currentTimeFilter, searchQuery),
-            fetchGateio(currentPage, limitPerPage, currentTimeFilter, searchQuery),
+        const tickerData = await fetchTickers(currentPage, limitPerPage, currentTimeFilter, searchQuery);
+
+        // Check if there are more pages to fetch
+        if (!tickerData.meta || !tickerData.meta.isNextPage) {
+            isNextPageAvailable = false;
+        }
+
+        const coinData = tickerData.data.map((coin) => ({
+            coin,
+            aevo: 'None',
+            hyperliquid: 'None',
+            bybit: 'None',
+            gateio: 'None',
+            average: 'None'
+        }));
+
+        renderTable(coinData);  // Render initial table with placeholder values
+
+        // Fetch data asynchronously and update the table after each fetch
+        await Promise.all([
+            fetchDataAndRenderCoin(fetchAevo, coinData, 'aevo'),
+            fetchDataAndRenderCoin(fetchHyperliquid, coinData, 'hyperliquid'),
+            fetchDataAndRenderCoin(fetchBybit, coinData, 'bybit'),
+            fetchDataAndRenderCoin(fetchGateio, coinData, 'gateio')
         ]);
 
-        loadingSpinner.style.display = 'none'; // Hide the loading spinner
-
-        // Concatenate the new data with the existing data
-        const newCoinData = data.data.map((coin, index) => {
-            const aevoValue = aevo.data[index];
-            const hyperliquidValue = hyperliquid.data[index];
-            const bybitValue = bybit.data[index];
-            const gateioValue = gateio.data[index];
-            const average = calculateAverage([aevoValue, hyperliquidValue, bybitValue, gateioValue]);
-
-            return {
-                coin,
-                aevo: aevoValue,
-                hyperliquid: hyperliquidValue,
-                bybit: bybitValue,
-                gateio: gateioValue,
-                average
-            };
+        // After all fetching, calculate the average and re-render the table
+        coinData.forEach(coinEntry => {
+            coinEntry.average = calculateAverage([
+                coinEntry.aevo,
+                coinEntry.hyperliquid,
+                coinEntry.bybit,
+                coinEntry.gateio
+            ]);
         });
 
-        allCoinData = allCoinData.concat(newCoinData);
+        // Append the new data to the allCoinData array
+        allCoinData = allCoinData.concat(coinData);
 
-        // Render the table with the updated data
-        sortAndRenderData(); // Ensure the data is sorted before rendering
+        // Re-render the table with the updated allCoinData
+        renderTable(allCoinData);
+
         currentPage++;
     } catch (error) {
         console.error("Error fetching data:", error);
-        loadingSpinner.style.display = 'none'; // Hide the loading spinner in case of error
     } finally {
         isFetching = false;
+        loadingSpinner.style.display = 'none';
+        loadingContainer.style.visibility = 'hidden';
     }
 };
 
@@ -236,8 +264,10 @@ const observer = new IntersectionObserver(async (entries) => {
     entries.forEach(entry => {
         if (entry.isIntersecting && !isFetching) {
             debounce(() => {
-                console.log("Sentinel is intersecting, fetching more data...");
-                fetchAndRenderCoinData();
+                if (isNextPageAvailable) {
+                    console.log("Sentinel is intersecting, fetching more data...");
+                    fetchAndRenderCoinData();
+                }
             }, 200); // Debounce delay of 200ms
         }
     });
@@ -364,7 +394,6 @@ window.onclick = function(event) {
     }
 }
 
-
 const populateCoinDropdown = (coins) => {
     const coinOptions = coins.map(coin => ({
         id: coin.coin,
@@ -396,37 +425,39 @@ const fetchCoinDataForModal = async () => {
 
 // Arbitrage Calculation Logic
 document.getElementById('arbitrageForm').addEventListener('submit', async function(event) {
+    document.getElementById('result').innerText = '';
     event.preventDefault();
 
     const exchangeA = document.getElementById('exchangeA').value;
     const exchangeB = document.getElementById('exchangeB').value;
     const coin = document.getElementById('coin').value;
     const amount = parseFloat(document.getElementById('amount').value);
+    const time = document.getElementById('timeInterval').value;
 
     async function getFundingRate(exchange, coin) {
         if (exchange === "aevo") {
-            const fundingRate = await fetchAevo(1, limitPerPage, currentTimeFilter, coin);
+            const fundingRate = await fetchAevo(1, limitPerPage, time, coin);
             if (fundingRate.data[0] !== "None") {
                 return fundingRate.data[0];
             } else {
                 return 0;
             }
         } else if (exchange === "hyperliquid") {
-            const fundingRate = await fetchHyperliquid(1, limitPerPage, currentTimeFilter, coin);
+            const fundingRate = await fetchHyperliquid(1, limitPerPage, time, coin);
             if (fundingRate.data[0] !== "None") {
                 return fundingRate.data[0];
             } else {
                 return 0;
             }
         } else if (exchange === "bybit") {
-            const fundingRate = await fetchBybit(1, limitPerPage, currentTimeFilter, coin);
+            const fundingRate = await fetchBybit(1, limitPerPage, time, coin);
             if (fundingRate.data[0] !== "None") {
                 return fundingRate.data[0];
             } else {
                 return 0;
             }
         } else if (exchange === "gateio") {
-            const fundingRate = await fetchGateio(1, limitPerPage, currentTimeFilter, coin);
+            const fundingRate = await fetchGateio(1, limitPerPage, time, coin);
             if (fundingRate.data[0] !== "None") {
                 return fundingRate.data[0];
             } else {

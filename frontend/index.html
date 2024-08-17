@@ -85,6 +85,10 @@
                 <button class="time-filter">1Y</button>
             </div>
         </div>
+        <div class="loadingContainer" id="loadingContainer" style="visibility: hidden;">
+            <p class="loadingText">Loading</p>
+            <div id="loadingSpinner" class="spinner" style="display: none;"></div>
+        </div>
         <main>
             <div class="table-container">
                 <table id="coinTable">
@@ -132,7 +136,6 @@
                     </tbody>
                 </table>
             </div>
-            <div id="loadingSpinner" class="spinner" style="display: none;"></div>
         </main>
         <footer class="footer">
             <p>Current UTC Time: <span id="currentLocalTime"></span></p>
@@ -169,6 +172,17 @@
                     <label for="coin">Coin:</label>
                     <select id="coin" name="coin" required>
                         <!-- Add more coins as needed -->
+                    </select>
+                </div>
+
+                <div class="input-group">
+                    <label for="timeInterval">Time Interval:</label>
+                    <select id="timeInterval" name="timeInterval" required>
+                        <option value="1h">1H</option>
+                        <option value="1d">1D</option>
+                        <option value="7d">7D</option>
+                        <option value="1m">1M</option>
+                        <option value="1y">1Y</option>
                     </select>
                 </div>
 

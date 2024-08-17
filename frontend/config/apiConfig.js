@@ -1,4 +1,4 @@
-const baseUrl = 'https://239f-104-28-215-133.ngrok-free.app/';
+const baseUrl = 'http://127.0.0.1:5000';
 
 export const API_CONFIG = {
     endpoints: {
