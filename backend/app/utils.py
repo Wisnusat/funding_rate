@@ -3,7 +3,7 @@ import re
 from datetime import datetime, timedelta
 
 def load_tickers():
-    with open("data_const/ticker.json", 'r') as f:
+    with open("data_const/ticker.json", 'r', encoding='utf-8') as f:
         data = json.load(f)
     return data
 
@@ -28,7 +28,7 @@ def get_timeframe(timeframe: str):
 
 def get_logo_url(symbol, file_path='data_const/crypto_logos.json'):
     # Load the JSON content from the file
-    with open(file_path, 'r') as file:
+    with open(file_path, 'r', encoding='utf-8') as file:
         cc_coins = json.load(file)
     
     # Search for the coin with the matching symbol
