@@ -1,4 +1,4 @@
-const baseUrl = 'https://239f-104-28-215-133.ngrok-free.app/';
+const baseUrl = 'https://5393-104-28-247-132.ngrok-free.app/';
 
 export const API_CONFIG = {
     endpoints: {
