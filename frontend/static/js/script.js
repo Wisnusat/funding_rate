@@ -131,14 +131,28 @@ const setupEventListeners = () => {
     searchBarMobile.addEventListener('input', () => {
         debounce(() => {
             searchQuery = searchBarMobile.value;
-            filterAndRenderData(); // Filter and render data when the search query changes
+            allCoinData = [];
+            currentPage = 1;
+            if (searchQuery) {
+                filterAndRenderData(); // Filter and render data when the search query changes
+            } else {
+                isNextPageAvailable = true;
+                refreshData(); // Refresh data if search query is cleared
+            }
         }, 300); // Debounce delay of 300ms
     });
-
+    
     searchBarDesktop.addEventListener('input', () => {
         debounce(() => {
             searchQuery = searchBarDesktop.value;
-            filterAndRenderData(); // Filter and render data when the search query changes
+            allCoinData = [];
+            currentPage = 1;
+            if (searchQuery) {
+                filterAndRenderData(); // Filter and render data when the search query changes
+            } else {
+                isNextPageAvailable = true;
+                refreshData(); // Refresh data if search query is cleared
+            }
         }, 300); // Debounce delay of 300ms
     });
 
