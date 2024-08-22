@@ -295,8 +295,15 @@ let sortState = {
 // Function to compare values for sorting
 const compareValues = (key, order = 'asc') => {
     return function(a, b) {
-        const aValue = key === 'average' ? parseFloat(a[key]) : (key === 'coin' ? a.coin[key] : parseFloat(a[key]));
-        const bValue = key === 'average' ? parseFloat(b[key]) : (key === 'coin' ? b.coin[key] : parseFloat(b[key]));
+        let aValue, bValue;
+
+        if (key === 'average' || key !== 'coin') {
+            aValue = a[key] === 'None' ? Number.NEGATIVE_INFINITY : parseFloat(a[key]);
+            bValue = b[key] === 'None' ? Number.NEGATIVE_INFINITY : parseFloat(b[key]);
+        } else {
+            aValue = a.coin[key] === 'None' ? Number.NEGATIVE_INFINITY : a.coin[key];
+            bValue = b.coin[key] === 'None' ? Number.NEGATIVE_INFINITY : b.coin[key];
+        }
 
         let comparison = 0;
         if (aValue > bValue) comparison = 1;
