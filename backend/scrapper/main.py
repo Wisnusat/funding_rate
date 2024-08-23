@@ -8,37 +8,37 @@ from platforms.bybit import Bybit
 from platforms.hyperliquid import Hyperliquid
 from platforms.gateio import Gateio
 
-def run_scrapers_sequential():
+def run_scrapers_sequential(interval='1h'):
     """Run the scrapers sequentially."""
     try:
-        # print("\n\nRunning AEVO scraper...\n")
-        # Aevo().run('1h')
-        # print("\nAEVO scraper completed.\n")
+        print("\n\nRunning AEVO scraper...\n")
+        Aevo().run(interval)
+        print("\nAEVO scraper completed.\n")
 
         print("\nRunning Bybit scraper...\n")
-        Bybit().run('1d')
+        Bybit().run(interval)
         print("\nBybit scraper completed.\n")
 
-        # print("\nRunning Hyperliquid scraper...\n")
-        # Hyperliquid().run('1h')
-        # print("\nHyperliquid scraper completed.\n")
+        print("\nRunning Hyperliquid scraper...\n")
+        Hyperliquid().run(interval)
+        print("\nHyperliquid scraper completed.\n")
 
-        # print("\nRunning Gate.io scraper...\n")
-        # Gateio().run(10)
-        # print("\nGate.io scraper completed.\n")
+        print("\nRunning Gate.io scraper...\n")
+        Gateio().run(10 if interval != '1y' else 100)
+        print("\nGate.io scraper completed.\n")
 
     except Exception as e:
         print(f"Error occurred: {e}")
 
-def run_scrapers_parallel():
+def run_scrapers_parallel(interval='1h'):
     """Run the scrapers in parallel."""
     try:
         with ThreadPoolExecutor(max_workers=4) as executor:
             futures = [
-                # executor.submit(Aevo().run, '1h'),
-                executor.submit(Bybit().run, '1h'),
-                # executor.submit(Hyperliquid().run, '1h'),
-                # executor.submit(Gateio().run, 10)
+                executor.submit(Aevo().run, interval),
+                executor.submit(Bybit().run, interval),
+                executor.submit(Hyperliquid().run, interval),
+                executor.submit(Gateio().run, 10 if interval != '1y' else 100)
             ]
 
             for future in as_completed(futures):
@@ -58,9 +58,16 @@ def countdown_to_next_run(next_run_time):
             break
         print(f"\rTime until next run: {str(remaining_time).split('.')[0]}", end="")
         time.sleep(1)
+    print("\n")
 
 def main():
-    print("Select execution mode:")
+    first_run = input("First running? (y/n): ").strip().lower()
+    interval_scrapper = '1y' if first_run in ['y', 'yes'] else '1h' if first_run in ['n', 'no'] else None
+    if interval_scrapper is None:
+        print("Invalid choice. Exiting.")
+        return
+
+    print("\nSelect execution mode:")
     print("1. Sequential")
     print("2. Parallel")
     mode = input("Enter the number of your choice (1 or 2): ")
@@ -88,9 +95,9 @@ def main():
         return
 
     if mode == '1':
-        schedule_interval.do(run_scrapers_sequential)
+        schedule_interval.do(run_scrapers_sequential, interval_scrapper)
     elif mode == '2':
-        schedule_interval.do(run_scrapers_parallel)
+        schedule_interval.do(run_scrapers_parallel, interval_scrapper)
 
     # Keep the script running and check for scheduled tasks
     while True:

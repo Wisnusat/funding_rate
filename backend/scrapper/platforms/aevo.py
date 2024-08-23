@@ -10,7 +10,7 @@ class Aevo:
     def run(interval='1h'):
         aevo_assets = Aevo.fetch_aevo_instrument_names()
         aevo = Aevo()
-        print(f"Running AEVO scraper for {interval} interval with assets: {len(aevo_assets)}")
+        print(f"[AEVO]Running scraper for {interval} interval with assets: {len(aevo_assets)}")
         
         # Start timing
         start_time = time.time()
@@ -26,7 +26,7 @@ class Aevo:
         duration = end_time - start_time
         
         # Display duration
-        print(f"Data scraping completed in {duration:.2f} seconds.")
+        print(f"[AEVO]Data scraping completed in {duration:.2f} seconds.")
         
         save_to_database(processed_aevo_data, AevoDB)
     
@@ -52,7 +52,7 @@ class Aevo:
     @staticmethod
     def count_rows():
         count = count_rows(AevoDB)
-        print(f"Number of rows in the database: {count}")
+        print(f"[AEVO]Number of rows in the database: {count}")
 
     @staticmethod
     def get_data_by_params(instrument_name, interval='1h'):
@@ -71,12 +71,10 @@ class Aevo:
             response.raise_for_status()
 
             instrument_names = response.json()
-            print(f"Number of instrument names fetched: {len(instrument_names)}")
-
             return instrument_names
 
         except requests.RequestException as e:
-            print(f"An error occurred while fetching instrument names: {e}")
+            print(f"[AEVO]An error occurred while fetching instrument names: {e}")
             return []
 
     def fetch_aevo_data(instrument_name, start_time, end_time, limit=50):

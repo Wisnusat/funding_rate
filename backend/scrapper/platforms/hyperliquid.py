@@ -10,7 +10,7 @@ class Hyperliquid:
     @staticmethod
     def run(interval='1h'):
         hyperliquid_assets = Hyperliquid.fetch_hyperliquid_instrument_name()
-        print(f"Running Hyperliquid scraper for {interval} interval with assets: {len(hyperliquid_assets)}")
+        print(f"[Hyperliquid]Running scraper for {interval} interval with assets: {len(hyperliquid_assets)}")
 
         # Start timing
         start_time = time.time()
@@ -26,7 +26,7 @@ class Hyperliquid:
         duration = end_time - start_time
 
         # Display duration
-        print(f"Data scraping completed in {duration:.2f} seconds.")
+        print(f"[Hyperliquid]Data scraping completed in {duration:.2f} seconds.")
 
         # Save to database
         save_to_database(processed_data, HyperliquidDB)
@@ -49,11 +49,10 @@ class Hyperliquid:
             data = response.json()
 
             instrument_names = [instrument['name'] for instrument in data['universe']]
-            print(f"Number of instrument names fetched: {len(instrument_names)}")
             return instrument_names
 
         except requests.RequestException as e:
-            print(f"An error occurred while fetching metadata: {e}")
+            print(f"[Hyperliquid]An error occurred while fetching metadata: {e}")
             return []
 
     @staticmethod
@@ -76,7 +75,7 @@ class Hyperliquid:
     @staticmethod
     def count_rows():
         count = count_rows(HyperliquidDB)
-        print(f"Number of rows in the database: {count}")
+        print(f"[Hyperliquid]Number of rows in the database: {count}")
 
     @staticmethod
     def get_data_by_params(instrument_name):
@@ -117,7 +116,7 @@ class Hyperliquid:
                     data = response.json()
 
                     if not data:
-                        print(f"No data returned for {symbol}.")
+                        print(f"[Hyperliquid]No data returned for {symbol}.")
                         return all_data
 
                     loop += 1
@@ -140,7 +139,7 @@ class Hyperliquid:
                     time.sleep(wait_time)
         
         if req_failed:
-           print(f"{req_failed} Request failed")
+           print(f"[Hyperliquid]{req_failed} Request failed")
         
         return all_data
 

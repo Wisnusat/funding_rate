@@ -14,7 +14,7 @@ class Bybit:
     def run(interval='1h'):
         bybit_assets = Bybit.fetch_bybit_instrument_names()
         # bybit_assets = ["BTC"]
-        print(f"Running Bybit scraper for {interval} interval with assets: {len(bybit_assets)}")
+        print(f"[BYBIT]Running scraper for {interval} interval with assets: {len(bybit_assets)}")
         
         # Start timing
         start_time = time.time()
@@ -30,7 +30,7 @@ class Bybit:
         duration = end_time - start_time
 
         # Display duration
-        print(f"Data scraping completed in {duration:.2f} seconds.")
+        print(f"[BYBIT]Data scraping completed in {duration:.2f} seconds.")
 
         # Save to database
         save_to_database(processed_data, BybitDB)
@@ -57,7 +57,7 @@ class Bybit:
     @staticmethod
     def count_rows():
         count = count_rows(BybitDB)
-        print(f"Number of rows in the database: {count}")
+        print(f"[BYBIT]Number of rows in the database: {count}")
 
     @staticmethod
     def get_data_by_params(instrument_name, interval='1h'):
@@ -80,13 +80,10 @@ class Bybit:
 
             # Extract base_currency from each instrument
             instrument_names = [instrument['base_currency'] for instrument in instruments]
-            
-            print(f"Number of instrument names fetched: {len(instrument_names)}")
-
             return instrument_names
 
         except requests.RequestException as e:
-            print(f"An error occurred while fetching instrument names: {e}")
+            print(f"[BYBIT]An error occurred while fetching instrument names: {e}")
             return []
     
     def fetch_bybit_data(symbol, start_time, end_time, limit=200):
@@ -119,7 +116,7 @@ class Bybit:
 
                     if data['retCode'] != 0:
                         error_message = data.get('retMsg', 'Unknown error')
-                        print(f"[{retries}]Error fetching {symbol} data: {error_message}")
+                        print(f"[BYBIT][{retries}]Error fetching {symbol} data: {error_message}")
                         
                         # Break the loop if it's an invalid symbol error or retries have been exhausted
                         if 'Symbol Invalid' in error_message or retries >= max_retries:
@@ -130,7 +127,7 @@ class Bybit:
                         time.sleep(wait_time)
                         continue
 
-                    print(f"[BYBIT]Data fetched for {symbol}")
+                    # print(f"[BYBIT]Data fetched for {symbol}")
                     loop += 1
                     all_data.extend(data['result']['list'])
 
@@ -142,7 +139,7 @@ class Bybit:
                     current_end_time = min(int(item['fundingRateTimestamp']) for item in data['result']['list'])
                     break  # Break out of the retry loop if successful
                 except requests.RequestException as e:
-                    print(f"Request failed: {e}")
+                    print(f"[BYBIT]Request failed: {e}")
                     retries += 1
                     if retries >= max_retries:
                         return []  # Break out of the loop after max retries and return an empty list
