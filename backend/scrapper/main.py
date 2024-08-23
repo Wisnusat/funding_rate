@@ -80,6 +80,7 @@ def main():
 
     # Prompt for the next interval and scheduler setup
     if first_run in ['y', 'yes']:
+        print("\nThe first run will be done with a 1 year interval.") 
         print("\nSelect interval for future scrapes after the first run:")
     else:
         print("\nSelect the interval for running the scrapers:")

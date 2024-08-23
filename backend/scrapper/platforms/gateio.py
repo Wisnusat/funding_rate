@@ -26,7 +26,7 @@ class Gateio:
         duration = end_time - start_time
 
         # Display duration
-        print(f"Data scraping completed in {duration:.2f} seconds.")
+        print(f"[Gateio]Data scraping completed in {duration:.2f} seconds.")
 
         # Save to database
         save_to_database(processed_data, GateioDB)
