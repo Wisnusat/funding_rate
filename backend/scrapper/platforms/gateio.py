@@ -10,13 +10,13 @@ class Gateio:
     def run(limit=1):
         gateio_assets = Gateio.fetch_gateio_instrument_name()
         # gateio_assets = ["btc"]
-        print(f"Running Gateio scraper for {interval} interval with assets: {len(gateio_assets)}")
+        print(f"[Gateio]Running scraper for {limit} limit with assets: {len(gateio_assets)}")
 
         # Start timing
         start_time = time.time()
 
         # Fetch and process data from Gateio
-        gateio_data = Gateio.runWithThreading(Gateio.fetch_gateio_data, interval, gateio_assets, limit)
+        gateio_data = Gateio.runWithThreading(Gateio.fetch_gateio_data, gateio_assets, limit)
         
         # Process data to match the expected format
         processed_data = Gateio.process_gateio_data(gateio_data)
@@ -26,7 +26,7 @@ class Gateio:
         duration = end_time - start_time
 
         # Display duration
-        print(f"Data scraping completed in {duration:.2f} seconds.")
+        print(f"[Gateio]Data scraping completed in {duration:.2f} seconds.")
 
         # Save to database
         save_to_database(processed_data, GateioDB)
@@ -48,7 +48,7 @@ class Gateio:
             return instrument_names
 
         except requests.RequestException as e:
-            print(f"An error occurred while fetching instrument names: {e}")
+            print(f"[Gateio]An error occurred while fetching instrument names: {e}")
             return []
 
     @staticmethod
@@ -73,7 +73,7 @@ class Gateio:
     @staticmethod
     def count_rows():
         count = count_rows(GateioDB)
-        print(f"Number of rows in the database: {count}")
+        print(f"[Gateio]Number of rows in the database: {count}")
 
     @staticmethod
     def get_data_by_params(instrument_name):
@@ -104,7 +104,7 @@ class Gateio:
                 data = response.json()
 
                 if not data:
-                    print(f"No data returned for {symbol}.")
+                    print(f"[Gateio]No data returned for {symbol}.")
                     return []
 
                 # Add the symbol to each entry in the returned data
@@ -119,19 +119,19 @@ class Gateio:
                     # print(f"Bad Request (400) for symbol: {symbol}. Skipping this symbol.")
                     return []  # Skip this symbol entirely
                 else:
-                    print(f"Request failed: {e}")
+                    print(f"[Gateio]Request failed: {e}")
                     retries += 1
                     if retries >= max_retries:
-                        print("Max retries reached. Returning what we have so far.")
+                        print("[Gateio]Max retries reached. Returning what we have so far.")
                         return []  # Return what we have so far if retries are exhausted
                     wait_time = backoff_factor ** retries
                     time.sleep(wait_time)
 
             except requests.RequestException as e:
-                print(f"Request failed: {e}")
+                print(f"[Gateio]Request failed: {e}")
                 retries += 1
                 if retries >= max_retries:
-                    print("Max retries reached. Returning what we have so far.")
+                    print("[Gateio]Max retries reached. Returning what we have so far.")
                     return []  # Return what we have so far if retries are exhausted
                 wait_time = backoff_factor ** retries
                 time.sleep(wait_time)
@@ -140,9 +140,7 @@ class Gateio:
 
 
     @staticmethod
-    def runWithThreading(fetch_data_function, interval, instrument_names, limit):
-        start_time, end_time = get_timeframe(interval)
-
+    def runWithThreading(fetch_data_function, instrument_names, limit):
         results = []
         with ThreadPoolExecutor(max_workers=5) as executor:
             futures = [
