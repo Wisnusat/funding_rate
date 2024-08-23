@@ -60,6 +60,8 @@ def countdown_to_next_run(next_run_time):
         time.sleep(1)
     print("\n")
 
+import schedule
+
 def main():
     first_run = input("First running? (y/n): ").strip().lower()
     interval_scrapper = '1y' if first_run in ['y', 'yes'] else '1h' if first_run in ['n', 'no'] else None
@@ -76,28 +78,63 @@ def main():
         print("Invalid choice. Exiting.")
         return
 
-    print("\nSelect the interval for running the scrapers:")
+    # Prompt for the next interval and scheduler setup
+    if first_run in ['y', 'yes']:
+        print("\nSelect interval for future scrapes after the first run:")
+    else:
+        print("\nSelect the interval for running the scrapers:")
+
+    print("1. 1 Hour (1h)")
+    print("2. 1 Day (1d)")
+    print("3. 7 Days (7d)")
+    print("4. 1 Month (1M)")
+    print("5. 1 Year (1y)")
+    interval_choice = input("Enter the number of your choice: ")
+
+    next_interval_scrapper = {
+        '1': '1h',
+        '2': '1d',
+        '3': '7d',
+        '4': '1M',
+        '5': '1y'
+    }.get(interval_choice)
+
+    if not next_interval_scrapper:
+        print("Invalid interval choice. Exiting.")
+        return
+
+    print("\nSelect the interval for scheduling the scrapers:")
     print("1. Every few seconds")
     print("2. Every hour at a specific minute")
-    interval_choice = input("Enter the number of your choice (1 or 2): ")
+    schedule_choice = input("Enter the number of your choice (1 or 2): ")
 
-    if interval_choice == '1':
+    if schedule_choice == '1':
         interval_value = int(input("Enter the interval in seconds: "))
         schedule_interval = schedule.every(interval_value).seconds
-    elif interval_choice == '2':
+    elif schedule_choice == '2':
         minute = input("Enter the minute (00-59) when the scrapers should run every hour: ").zfill(2)
         if not minute.isdigit() or not (0 <= int(minute) < 60):
             print("Invalid minute value. Exiting.")
             return
         schedule_interval = schedule.every().hour.at(f":{minute}")
+        print(f"Scrapers will run every hour at minute :{minute}.")
+        print("\n")
     else:
-        print("Invalid interval choice. Exiting.")
+        print("Invalid scheduling choice. Exiting.")
         return
 
+    # Schedule the selected mode and interval for future runs
     if mode == '1':
-        schedule_interval.do(run_scrapers_sequential, interval_scrapper)
+        schedule_interval.do(run_scrapers_sequential, next_interval_scrapper)
     elif mode == '2':
-        schedule_interval.do(run_scrapers_parallel, interval_scrapper)
+        schedule_interval.do(run_scrapers_parallel, next_interval_scrapper)
+
+    # Run the scraper with '1y' interval first if it's the first run
+    if first_run in ['y', 'yes']:
+        if mode == '1':
+            run_scrapers_sequential('1y')
+        elif mode == '2':
+            run_scrapers_parallel('1y')
 
     # Keep the script running and check for scheduled tasks
     while True:
@@ -108,3 +145,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
