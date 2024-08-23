@@ -181,6 +181,7 @@ const fetchAndRenderCoinData = async () => {
     loadingContainer.style.visibility = 'visible';
 
     try {
+        // Fetch ticker data for the current page
         const tickerData = await fetchTickers(currentPage, limitPerPage, currentTimeFilter, searchQuery);
 
         // Check if there are more pages to fetch
@@ -188,6 +189,7 @@ const fetchAndRenderCoinData = async () => {
             isNextPageAvailable = false;
         }
 
+        // Process fetched data
         const coinData = tickerData.data.map((coin) => ({
             coin,
             aevo: 'None',
@@ -197,9 +199,7 @@ const fetchAndRenderCoinData = async () => {
             average: 'None'
         }));
 
-        renderTable(coinData);  // Render initial table with placeholder values
-
-        // Fetch data asynchronously and update the table after each fetch
+        // Fetch data for each exchange asynchronously
         await Promise.all([
             fetchDataAndRenderCoin(fetchAevo, coinData, 'aevo'),
             fetchDataAndRenderCoin(fetchHyperliquid, coinData, 'hyperliquid'),
@@ -207,7 +207,7 @@ const fetchAndRenderCoinData = async () => {
             fetchDataAndRenderCoin(fetchGateio, coinData, 'gateio')
         ]);
 
-        // After all fetching, calculate the average and re-render the table
+        // Calculate averages for the fetched coin data
         coinData.forEach(coinEntry => {
             coinEntry.average = calculateAverage([
                 coinEntry.aevo,
@@ -217,12 +217,13 @@ const fetchAndRenderCoinData = async () => {
             ]);
         });
 
-        // Append the new data to the allCoinData array
+        // Append the new coin data to the existing allCoinData array
         allCoinData = allCoinData.concat(coinData);
 
-        // Re-render the table with the updated allCoinData
+        // Render the full data (existing + new) to the table
         renderTable(allCoinData);
 
+        // Increment the page number for the next fetch
         currentPage++;
     } catch (error) {
         console.error("Error fetching data:", error);
