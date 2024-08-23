@@ -119,7 +119,7 @@ class Bybit:
 
                     if data['retCode'] != 0:
                         error_message = data.get('retMsg', 'Unknown error')
-                        # print(f"[{retries}]Error fetching {symbol} data: {error_message}")
+                        print(f"[{retries}]Error fetching {symbol} data: {error_message}")
                         
                         # Break the loop if it's an invalid symbol error or retries have been exhausted
                         if 'Symbol Invalid' in error_message or retries >= max_retries:
@@ -130,7 +130,7 @@ class Bybit:
                         time.sleep(wait_time)
                         continue
 
-                    # print(f"[BYBIT]Data fetched for {symbol}")
+                    print(f"[BYBIT]Data fetched for {symbol}")
                     loop += 1
                     all_data.extend(data['result']['list'])
 

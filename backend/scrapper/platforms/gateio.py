@@ -10,13 +10,13 @@ class Gateio:
     def run(limit=1):
         gateio_assets = Gateio.fetch_gateio_instrument_name()
         # gateio_assets = ["btc"]
-        print(f"Running Gateio scraper for {interval} interval with assets: {len(gateio_assets)}")
+        print(f"Running Gateio scraper for {limit} limit with assets: {len(gateio_assets)}")
 
         # Start timing
         start_time = time.time()
 
         # Fetch and process data from Gateio
-        gateio_data = Gateio.runWithThreading(Gateio.fetch_gateio_data, interval, gateio_assets, limit)
+        gateio_data = Gateio.runWithThreading(Gateio.fetch_gateio_data, gateio_assets, limit)
         
         # Process data to match the expected format
         processed_data = Gateio.process_gateio_data(gateio_data)
@@ -140,9 +140,7 @@ class Gateio:
 
 
     @staticmethod
-    def runWithThreading(fetch_data_function, interval, instrument_names, limit):
-        start_time, end_time = get_timeframe(interval)
-
+    def runWithThreading(fetch_data_function, instrument_names, limit):
         results = []
         with ThreadPoolExecutor(max_workers=5) as executor:
             futures = [

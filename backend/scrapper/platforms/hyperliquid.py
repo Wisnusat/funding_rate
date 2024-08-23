@@ -21,8 +21,6 @@ class Hyperliquid:
         # Process data to match the expected format
         processed_data = Hyperliquid.process_hyperliquid_data(hyperliquid_data)
 
-        print(processed_data)
-
         # End timing
         end_time = time.time()
         duration = end_time - start_time
@@ -93,6 +91,8 @@ class Hyperliquid:
         current_start_time = start_time
         loop = 1
 
+        req_failed = 0
+
         while current_start_time < end_time:
             headers = {
                 'Content-Type': 'application/json',
@@ -131,14 +131,17 @@ class Hyperliquid:
                     break  # Break out of the retry loop if successful
 
                 except requests.RequestException as e:
-                    print(f"Request failed: {e}")
+                    req_failed += 1
                     retries += 1
                     if retries >= max_retries:
-                        print("Max retries reached. Returning what we have so far.")
+                        # print("Max retries reached. Returning what we have so far.")
                         return all_data  # Return what we have so far if retries are exhausted
                     wait_time = backoff_factor ** retries
                     time.sleep(wait_time)
-
+        
+        if req_failed:
+           print(f"{req_failed} Request failed")
+        
         return all_data
 
     @staticmethod

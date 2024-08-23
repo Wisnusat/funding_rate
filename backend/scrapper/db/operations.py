@@ -4,7 +4,8 @@ from utils.common import get_timeframe
 from db.models import Base
 
 # Database connection setup
-DATABASE_URL = "postgresql://admindev:admindev@localhost:5432/funding_data_scrape"
+# DATABASE_URL = "postgresql://admindev:admindev@localhost:5432/funding_data_scrape"
+DATABASE_URL = "postgresql://postgres.uzgtuydizbithgjjcnko:hbLkWC5ytDDpGj87@aws-0-ap-southeast-1.pooler.supabase.com:6543/postgres"
 engine = create_engine(DATABASE_URL)
 
 # Create tables in the database if they do not exist
