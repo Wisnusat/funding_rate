@@ -1,5 +1,5 @@
-from app.models import User
-from app.extensions import db
+from app.db.models import User
+from app.db.extensions import db
 from werkzeug.security import generate_password_hash
 
 class UserService:

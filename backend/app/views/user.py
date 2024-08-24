@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify
 from app.services.user_service import UserService
-from app.schemas import UserSchema
+from app.db.schemas import UserSchema
 from app.middleware.auth_middleware import token_required
 from sqlalchemy.exc import IntegrityError
 

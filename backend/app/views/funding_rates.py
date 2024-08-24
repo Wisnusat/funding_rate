@@ -5,8 +5,26 @@ from app.services.fr_hyperliquid import Hyperliquid
 from app.services.fr_bybit import Bybit
 from app.services.fr_gateio import Gateio
 from app.services.fr_service import FrService
+from app.services.scp import scrapper, scrapper_with_pagination
 
 funding_rates_bp = Blueprint('funding-rates', __name__)
+
+# New route to aggregate funding data
+@funding_rates_bp.route('/aggregated-funding', methods=['GET'])
+@token_required
+def get_aggregated_funding(current_user):
+    page = request.args.get('page', default=1, type=int)
+    limit = request.args.get('limit', default=10, type=int)
+    time = request.args.get('time', default='1h', type=str)
+    sort_order = request.args.get('sort_order', default='asc', type=str)
+    keyword = request.args.get('keyword', default=None, type=str)
+
+    try:
+        # aggregated_data = scrapper(interval=interval, coin=coin)
+        aggregated_data = scrapper_with_pagination(page, limit, time, sort_order, keyword)
+        return jsonify(aggregated_data)
+    except Exception as e:
+        return jsonify({'code': 500, 'message': str(e)}), 500
 
 @funding_rates_bp.route('/tickers', methods=['GET'])
 @token_required

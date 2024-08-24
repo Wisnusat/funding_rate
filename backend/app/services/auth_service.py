@@ -1,5 +1,5 @@
 from werkzeug.security import check_password_hash
-from app.models import User
+from app.db.models import User
 import jwt
 import datetime
 from flask import current_app
