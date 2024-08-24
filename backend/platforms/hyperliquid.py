@@ -78,6 +78,7 @@ class Hyperliquid:
         print(f"[Hyperliquid]Number of rows in the database: {count}")
 
     @staticmethod
+    # https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-historical-funding-rates
     def fetch_hyperliquid_data(symbol, start_time, end_time, limit=500):
         ua = UserAgent()
         url = 'https://api.hyperliquid.xyz/info'

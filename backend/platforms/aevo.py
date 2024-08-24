@@ -72,6 +72,7 @@ class Aevo:
             print(f"[AEVO]An error occurred while fetching instrument names: {e}")
             return []
 
+    # https://api-docs.aevo.xyz/reference/getfundinghistory
     def fetch_aevo_data(instrument_name, start_time, end_time, limit=50):
         url = 'https://api.aevo.xyz/funding-history'
         headers = {

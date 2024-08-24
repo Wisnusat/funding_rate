@@ -81,6 +81,7 @@ class Bybit:
             print(f"[BYBIT]An error occurred while fetching instrument names: {e}")
             return []
     
+    # https://bybit-exchange.github.io/docs/api-explorer/v5/market/history-fund-rate
     def fetch_bybit_data(symbol, start_time, end_time, limit=200):
         url = 'https://api.bybit.com/derivatives/v3/public/funding/history-funding-rate'
         headers = {

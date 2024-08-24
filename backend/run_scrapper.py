@@ -31,7 +31,7 @@ interval_mapping = {
 
 def run_scrapers_sequential(interval):
     """Run the scrapers sequentially."""
-    scrapers = [Aevo(), Bybit(), Hyperliquid(), Gateio()]
+    scrapers = [Gateio()]
     for scraper in scrapers:
         try:
             print(f"\nRunning {scraper.__class__.__name__} scraper...\n")

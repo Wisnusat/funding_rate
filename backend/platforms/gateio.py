@@ -76,12 +76,18 @@ class Gateio:
         print(f"[Gateio]Number of rows in the database: {count}")
 
     @staticmethod
-    def fetch_gateio_data(symbol, limit=1):
+    # https://www.gate.io/docs/developers/apiv4/#funding-rate-history 
+    def fetch_gateio_data(symbol, limit):
         url = 'https://api.gateio.ws/api/v4/futures/usdt/funding_rate'
         headers = {
             'Content-Type': 'application/json',
             'Accept': 'application/json'
         }
+
+        if limit == '1h':
+            limit = 10
+        else:
+            limit = 100
         
         params = {
             'contract': symbol.upper() + "_USDT",
@@ -106,7 +112,7 @@ class Gateio:
                 for entry in data:
                     entry['symbol'] = symbol.upper()
 
-                # print(f"[GATEIO]Data fetched for {symbol}")
+                print(f"[GATEIO]Data fetched for {symbol}")
                 return data
 
             except requests.exceptions.HTTPError as e:
