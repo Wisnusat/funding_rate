@@ -30,6 +30,15 @@ let isFetching = false;
 let allCoinData = []; // Store all fetched data
 let isNextPageAvailable = true; // Flag to check if there are more pages to fetch
 
+const showErrorNotification = (message) => {
+    const notification = document.getElementById('notification');
+    notification.textContent = message;
+    notification.classList.add('show');
+    setTimeout(() => {
+        notification.classList.remove('show');
+    }, 3000); // Hide after 3 seconds
+}
+
 const formatToFiveDecimalPlaces = (numberString) => {
     const number = parseFloat(numberString);
     const parts = numberString.split('.');
@@ -166,7 +175,7 @@ const fetchDataAndRenderCoin = async (fetchFunction, coinData, exchangeName) => 
             coinData[index][exchangeName] = rate !== "None" ? rate : 'None';
         });
     } catch (error) {
-        console.error(`Error fetching data from ${exchangeName}:`, error);
+        showErrorNotification(`Error fetching data from ${exchangeName}:`, error);
         coinData.forEach(data => data[exchangeName] = 'None');
     }
 
