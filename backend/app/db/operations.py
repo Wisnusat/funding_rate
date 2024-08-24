@@ -58,6 +58,25 @@ def get_unique_tickers_from_all_exchanges():
         )
         return sorted([ticker[0] for ticker in tickers])
 
+def get_tickers(keyword=None):
+    with Session() as session:
+        tickers = (
+            session.query(AevoDB.instrument_name)
+            .union(session.query(BybitDB.instrument_name))
+            .union(session.query(GateioDB.instrument_name))
+            .union(session.query(HyperliquidDB.instrument_name))
+            .distinct()
+            .all()
+        )
+        
+        # Filter tickers based on the keyword if provided
+        filtered_tickers = [
+            ticker[0] for ticker in tickers 
+            if keyword is None or keyword.lower() in ticker[0].lower()
+        ]
+        
+        return sorted(filtered_tickers)
+
 def adjust_timeframe(model_class, since, until):
     if model_class == AevoDB:
         since, until = since * 1000000, until * 1000000  # Convert seconds to microseconds

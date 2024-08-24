@@ -1,8 +1,24 @@
 from app.db.models import AevoDB, BybitDB, GateioDB, HyperliquidDB
-from app.db.operations import get_accumulated_funding_pagination, get_unique_tickers_from_all_exchanges
+from app.db.operations import get_tickers, get_accumulated_funding_pagination, get_unique_tickers_from_all_exchanges
 from collections import defaultdict
 from datetime import datetime
 from app.utils import get_logo_url, get_timeframe
+
+def get_coins(keyword=None):
+    # Assuming get_unique_tickers is a function that retrieves the unique tickers based on the keyword
+    unique_tickers = get_tickers(keyword)
+    
+    # Construct the data array with the required fields
+    data = []
+    for ticker in unique_tickers:
+        logo_url, name = get_logo_url(ticker)
+        data.append({
+            "coin": ticker,
+            "logo": logo_url or "https://cryptologos.cc/logos/default-logo.png",
+            "name": name or ticker
+        })
+
+    return data
 
 # Generic function to get paginated funding data for any exchange
 def get_funding_pagination(db_model, page, limit, since, until, sort_order, keyword):

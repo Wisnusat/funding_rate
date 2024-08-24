@@ -5,7 +5,7 @@ from app.services.fr_hyperliquid import Hyperliquid
 from app.services.fr_bybit import Bybit
 from app.services.fr_gateio import Gateio
 from app.services.fr_service import FrService
-from app.services.scp import scrapper_with_pagination
+from app.services.scp import scrapper_with_pagination, get_coins
 
 funding_rates_bp = Blueprint('funding-rates', __name__)
 
@@ -22,6 +22,16 @@ def get_aggregated_funding(current_user):
     try:
         aggregated_data = scrapper_with_pagination(page, limit, time, sort_order, keyword)
         return jsonify(aggregated_data)
+    except Exception as e:
+        return jsonify({'code': 500, 'message': str(e)}), 500
+
+@funding_rates_bp.route('/coins', methods=['GET'])
+@token_required
+def get_available_coins(current_user):
+    keyword = request.args.get('keyword', default=None, type=str)
+    try:
+        coins = get_coins(keyword)
+        return jsonify(coins)
     except Exception as e:
         return jsonify({'code': 500, 'message': str(e)}), 500
 
