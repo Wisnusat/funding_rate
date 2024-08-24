@@ -63,9 +63,8 @@ def get_unique_tickers_from_all_exchanges():
     session.close()
     return unique_tickers
 
-def get_accumulated_funding(model_class, time, keyword=None):
+def get_accumulated_funding(model_class, since, until, keyword=None):
     session = Session()
-    since, until = get_timeframe(time)
     
     # Directly use since and until without multiplying by 1000
     if model_class == AevoDB:
@@ -105,9 +104,8 @@ def get_accumulated_funding(model_class, time, keyword=None):
     session.close()
     return data
 
-def get_accumulated_funding_pagination(model_class, page, limit, time, sort_order, keyword=None):
+def get_accumulated_funding_pagination(model_class, page, limit, since, until, sort_order, keyword=None):
     session = Session()
-    since, until = get_timeframe(time)
     
     # Adjust timeframe handling based on the model class
     if model_class == AevoDB:

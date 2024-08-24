@@ -3,27 +3,26 @@ from app.db.operations import get_accumulated_funding, get_accumulated_funding_p
 from collections import defaultdict
 from decimal import Decimal
 import datetime
-from app.utils import get_logo_url
+from app.utils import get_logo_url, get_timeframe
 
 def get_tickers():
     tickers = get_unique_tickers_from_all_exchanges()
     return tickers
 
-def get_funding_aevo(time, keyword):
-    # data = get_accumulated_funding_pagination(AevoDB, page, limit, time, sort_order, keyword)
-    data = get_accumulated_funding(AevoDB, time, keyword)
+def get_funding_aevo(since, until, keyword):
+    data = get_accumulated_funding(AevoDB, since, until, keyword)
     return data
 
-def get_funding_bybit(time, keyword):
-    data = get_accumulated_funding(BybitDB, time, keyword)
+def get_funding_bybit(since, until, keyword):
+    data = get_accumulated_funding(BybitDB, since, until, keyword)
     return data
 
-def get_funding_gateio(time, keyword):
-    data = get_accumulated_funding(GateioDB, time, keyword)
+def get_funding_gateio(since, until, keyword):
+    data = get_accumulated_funding(GateioDB, since, until, keyword)
     return data
 
-def get_funding_hyperliquid(time, keyword):
-    data = get_accumulated_funding(HyperliquidDB, time, keyword)
+def get_funding_hyperliquid(since, until, keyword):
+    data = get_accumulated_funding(HyperliquidDB, since, until, keyword)
     return data
 
 def aggregate_funding_data(unique_tickers, aevo_data, bybit_data, gateio_data, hyperliquid_data):
@@ -46,31 +45,34 @@ def aggregate_funding_data(unique_tickers, aevo_data, bybit_data, gateio_data, h
     return dict(aggregated_data)
 
 # Main function to get aggregated funding data
-def scrapper(interval='1d', coin=None):
+def scrapper(time='1d', coin=None):
+    since, until = get_timeframe(time)
+
     unique_tickers = get_tickers()
-    aevo = get_funding_aevo(interval, coin)
-    bybit = get_funding_bybit(interval, coin)
-    gateio = get_funding_gateio(interval, coin)
-    hyperliquid = get_funding_hyperliquid(interval, coin)
+    aevo = get_funding_aevo(since, until, coin)
+    bybit = get_funding_bybit(since, until, coin)
+    gateio = get_funding_gateio(since, until, coin)
+    hyperliquid = get_funding_hyperliquid(since, until, coin)
     
     aggregated_data = aggregate_funding_data(unique_tickers, aevo, bybit, gateio, hyperliquid)
     return aggregated_data
 
+# ========================================================================================================
 # Pagination
-def get_funding_aevo_pagination(page, limit, time, sort_order, keyword):
-    data = get_accumulated_funding_pagination(AevoDB, page, limit, time, sort_order, keyword)
+def get_funding_aevo_pagination(page, limit, since, until, sort_order, keyword):
+    data = get_accumulated_funding_pagination(AevoDB, page, limit, since, until, sort_order, keyword)
     return data
 
-def get_funding_bybit_pagination(page, limit, time, sort_order, keyword):
-    data = get_accumulated_funding_pagination(BybitDB, page, limit, time, sort_order, keyword)
+def get_funding_bybit_pagination(page, limit, since, until, sort_order, keyword):
+    data = get_accumulated_funding_pagination(BybitDB, page, limit, since, until, sort_order, keyword)
     return data
 
-def get_funding_gateio_pagination(page, limit, time, sort_order, keyword):
-    data = get_accumulated_funding_pagination(GateioDB, page, limit, time, sort_order, keyword)
+def get_funding_gateio_pagination(page, limit, since, until, sort_order, keyword):
+    data = get_accumulated_funding_pagination(GateioDB, page, limit, since, until, sort_order, keyword)
     return data
 
-def get_funding_hyperliquid_pagination(page, limit, time, sort_order, keyword):
-    data = get_accumulated_funding_pagination(HyperliquidDB, page, limit, time, sort_order, keyword)
+def get_funding_hyperliquid_pagination(page, limit, since, until, sort_order, keyword):
+    data = get_accumulated_funding_pagination(HyperliquidDB, page, limit, since, until, sort_order, keyword)
     return data
 
 def aggregate_funding_data_pagination(unique_tickers, aevo_data, bybit_data, gateio_data, hyperliquid_data):
@@ -92,34 +94,38 @@ def aggregate_funding_data_pagination(unique_tickers, aevo_data, bybit_data, gat
 
     return dict(aggregated_data)
 
-# Main function to get paginated and aggregated funding data
-# def scrapper_with_pagination(page=1, limit=10, interval='1d', sort_order='asc', coin=None):
-#     unique_tickers = get_unique_tickers_from_all_exchanges()
-#     aevo = get_funding_aevo_pagination(1, 100, interval, sort_order, coin)  # Fetch more than needed for aggregation
-#     bybit = get_funding_bybit_pagination(1, 100, interval, sort_order, coin)
-#     gateio = get_funding_gateio_pagination(1, 100, interval, sort_order, coin)
-#     hyperliquid = get_funding_hyperliquid_pagination(1, 100, interval, sort_order, coin)
-    
-#     aggregated_data = aggregate_funding_data_pagination(unique_tickers, aevo, bybit, gateio, hyperliquid)
+# Main function to get aggregated funding data with pagination
+def scrapper_with_pagination(page=1, limit=10, time='1d', sort_order='asc', coin=None):
+    since, until = get_timeframe(time)
 
-#     # Apply pagination to the aggregated data
-#     start_index = (page - 1) * limit
-#     end_index = start_index + limit
-#     paginated_data = dict(list(aggregated_data.items())[start_index:end_index])
-    
-#     return paginated_data
-
-def scrapper_with_pagination(page=1, limit=10, interval='1d', sort_order='asc', coin=None):
     unique_tickers = get_unique_tickers_from_all_exchanges()
-    aevo = get_funding_aevo_pagination(1, 100, interval, sort_order, coin)  # Fetch more than needed for aggregation
-    bybit = get_funding_bybit_pagination(1, 100, interval, sort_order, coin)
-    gateio = get_funding_gateio_pagination(1, 100, interval, sort_order, coin)
-    hyperliquid = get_funding_hyperliquid_pagination(1, 100, interval, sort_order, coin)
+
+    # If a specific coin is provided, filter the unique_tickers accordingly
+    if coin:
+        unique_tickers = [ticker for ticker in unique_tickers if ticker.lower() == coin.lower()]
     
+    aevo = get_funding_aevo_pagination(1, 100, since, until, sort_order, coin)  # Fetch more than needed for aggregation
+    bybit = get_funding_bybit_pagination(1, 100, since, until, sort_order, coin)
+    gateio = get_funding_gateio_pagination(1, 100, since, until, sort_order, coin)
+    # hyperliquid = get_funding_hyperliquid_pagination(1, 100, since, until, sort_order, coin)
+    hyperliquid = []
+
     aggregated_data = aggregate_funding_data_pagination(unique_tickers, aevo, bybit, gateio, hyperliquid)
 
     # Apply pagination to the aggregated data
     total_items = len(aggregated_data)
+    
+    if total_items == 0:
+        # If no data is available, add unique tickers with null data
+        for ticker in unique_tickers:
+            aggregated_data[ticker] = {
+                "aevo": None,
+                "bybit": None,
+                "gateio": None,
+                "hyperliquid": None
+            }
+        total_items = len(aggregated_data)
+    
     start_index = (page - 1) * limit
     end_index = start_index + limit
     paginated_items = list(aggregated_data.items())[start_index:end_index]
@@ -133,10 +139,10 @@ def scrapper_with_pagination(page=1, limit=10, interval='1d', sort_order='asc', 
             "logo": logo_url or "https://cryptologos.cc/logos/default-logo.png",  # Fallback logo if not found
             "name": name or ticker,  # Fallback to ticker if name not found
             "funding": {
-                "aevo": funding_data["aevo"],
-                "bybit": funding_data["bybit"],
-                "gateio": funding_data["gateio"],
-                "hyperliquid": funding_data["hyperliquid"]
+                "aevo": funding_data.get("aevo", None),
+                "bybit": funding_data.get("bybit", None),
+                "gateio": funding_data.get("gateio", None),
+                "hyperliquid": funding_data.get("hyperliquid", None)
             }
         })
 
@@ -145,6 +151,11 @@ def scrapper_with_pagination(page=1, limit=10, interval='1d', sort_order='asc', 
     is_next_page = page < total_pages
 
     meta = {
+        "filter": {
+            "time": time,
+            "coin": coin or "All",
+            "sortOrder": sort_order
+        },
         "date": datetime.datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S UTC"),
         "isNextPage": is_next_page,
         "page": page,
@@ -154,3 +165,5 @@ def scrapper_with_pagination(page=1, limit=10, interval='1d', sort_order='asc', 
     }
 
     return {"data": data, "meta": meta}
+
+
