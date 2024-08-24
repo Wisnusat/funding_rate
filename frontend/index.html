@@ -169,10 +169,16 @@
                 </div>
 
                 <div class="input-group">
-                    <label for="coin">Coin:</label>
-                    <select id="coin" name="coin" required>
-                        <!-- Add more coins as needed -->
-                    </select>
+                    <label for="coinSearchDropdown">Select Coin:</label>
+                    <div class="custom-dropdown">
+                        <input type="text" id="coinSearchDropdown" placeholder="Search or select a coin..." />
+                        <div id="dropdownOptions" class="dropdown-options">
+                            <!-- Options will be dynamically populated here -->
+                        </div>
+                        <span id="dropdownLoading" class="dropdown-loading" style="display:none;">
+                            <span class="loading-spinner"></span> Loading...
+                        </span>
+                    </div>
                 </div>
 
                 <div class="input-group">
@@ -181,7 +187,7 @@
                         <option value="1h">1H</option>
                         <option value="1d">1D</option>
                         <option value="7d">7D</option>
-                        <option value="1m">1M</option>
+                        <option value="1M">1M</option>
                         <option value="1y">1Y</option>
                     </select>
                 </div>
@@ -192,6 +198,7 @@
                 </div>
 
                 <button type="submit" class="calculate-button">Calculate Arbitrage</button>
+                <span id="calculateLoading" class="loading-spinner" style="display:none;"></span>
             </form>
 
             <div id="result" class="result">

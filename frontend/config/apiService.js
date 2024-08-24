@@ -46,121 +46,6 @@ const register = async (username, password) => {
     }
 };
 
-const fetchAevo = async (page, limit, time, keyword) => {
-    const token = getCookie('token'); // Ambil token dari cookie
-
-    try {
-        const response = await fetch(API_CONFIG.endpoints.aevo(page, limit, time, keyword), {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}` // Menambahkan token pada header
-            },
-        });
-
-        if (!response.ok) {
-            return response.json();
-        }
-        
-        const data = await response.json();
-        return data;
-    } catch (error) {
-        return error;
-    }
-};
-
-const fetchHyperliquid = async (page, limit, time, keyword) => {
-    const token = getCookie('token'); // Ambil token dari cookie
-
-    try {
-        const response = await fetch(API_CONFIG.endpoints.hyperliquid(page, limit, time, keyword), {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}` // Menambahkan token pada header
-            },
-        });
-
-        if (!response.ok) {
-            return response.json();
-        }
-        
-        const data = await response.json();
-        return data;
-    } catch (error) {
-        return error;
-    }
-};
-
-const fetchBybit = async (page, limit, time, keyword) => {
-    const token = getCookie('token'); // Ambil token dari cookie
-
-    try {
-        const response = await fetch(API_CONFIG.endpoints.bybit(page, limit, time, keyword), {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}` // Menambahkan token pada header
-            },
-        });
-
-        if (!response.ok) {
-            return response.json();
-        }
-        
-        const data = await response.json();
-        return data;
-    } catch (error) {
-        return error;
-    }
-};
-
-const fetchGateio = async (page, limit, time, keyword) => {
-    const token = getCookie('token'); // Ambil token dari cookie
-
-    try {
-        const response = await fetch(API_CONFIG.endpoints.gateio(page, limit, time, keyword), {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}` // Menambahkan token pada header
-            },
-        });
-
-        if (!response.ok) {
-            return response.json();
-        }
-        
-        const data = await response.json();
-        return data;
-    } catch (error) {
-        return error;
-    }
-};
-
-const fetchTickers = async (page, limit, time, keyword) => {
-    const token = getCookie('token'); // Ambil token dari cookie
-
-    try {
-        const response = await fetch(API_CONFIG.endpoints.tickers(page, limit, time, keyword), {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}` // Menambahkan token pada header
-            },
-        });
-
-        if (!response.ok) {
-            return response.json();
-        }
-        
-        const data = await response.json();
-        return data;
-    } catch (error) {
-        return error;
-    }
-};
-
 const fetchDetailCoin = async (coin) => {
     try {
         const response = await fetch(API_CONFIG.endpoints.detailCoin(coin), {
@@ -183,13 +68,56 @@ const fetchDetailCoin = async (coin) => {
     }
 };
 
+const fetchCoin = async (page, limit, time, keyword) => {
+    const token = getCookie('token'); // Ambil token dari cookie
+
+    try {
+        const response = await fetch(API_CONFIG.endpoints.allCoin(page, limit, time, keyword), {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}` // Menambahkan token pada header
+            },
+        });
+
+        if (!response.ok) {
+            return response.json();
+        }
+        
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        return error;
+    }
+};
+
+const fetchCoinList = async (keyword) => {
+    const token = getCookie('token'); // Ambil token dari cookie
+
+    try {
+        const response = await fetch(API_CONFIG.endpoints.coinList(keyword), {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}` // Menambahkan token pada header
+            },
+        });
+
+        if (!response.ok) {
+            return response.json();
+        }
+        
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        return error;
+    }
+};
+
 export {
     login,
     register,
-    fetchAevo,
-    fetchHyperliquid,
-    fetchGateio,
-    fetchBybit,
-    fetchTickers,
     fetchDetailCoin,
+    fetchCoin,
+    fetchCoinList,
 };

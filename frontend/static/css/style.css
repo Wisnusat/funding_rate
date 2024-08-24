@@ -563,6 +563,77 @@ table td {
     vertical-align: middle;
 }
 
+.custom-dropdown {
+    position: relative;
+    width: 100%;
+}
+
+.custom-dropdown input {
+    width: 100%;
+    padding: 8px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+}
+
+.dropdown-options {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    max-height: 200px;
+    overflow-y: auto;
+    background-color: white;
+    border: 1px solid #ccc;
+    border-top: none;
+    z-index: 1000;
+    display: none;
+    /* Initially hidden */
+}
+
+.dropdown-options .option {
+    padding: 8px;
+    cursor: pointer;
+    border-bottom: 1px solid #eee;
+}
+
+.dropdown-options .option:hover {
+    background-color: #f0f0f0;
+}
+
+/* Loading spinner styles */
+.loading-spinner {
+    border: 2px solid #f3f3f3; /* Light grey */
+    border-top: 2px solid #3498db; /* Blue */
+    border-radius: 50%;
+    width: 16px;
+    height: 16px;
+    animation: spin 1s linear infinite;
+    display: inline-block;
+    vertical-align: middle;
+    margin-right: 8px; /* Adjust the spacing as needed */
+}
+
+.dropdown-loading {
+    font-size: 14px; /* Adjust the font size as needed */
+    color: #333; /* Adjust the text color */
+    display: inline-flex;
+    align-items: center;
+    margin-top: 8px; /* Optional: spacing from input */
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Style for the disabled calculate button */
+.calculate-button.disabled {
+    background-color: #ccc; /* Greyed out background */
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
     .main-content {
