@@ -4,9 +4,9 @@ import time, datetime
 import logging
 import json
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from db.models import BybitDB
-from db.operations import save_to_database, delete_all_data, count_rows, get_data_by_params
-from utils.common import get_timeframe
+from app.db.models import BybitDB
+from app.db.operations import save_to_database, delete_all_data, count_rows
+from app.utils import get_timeframe
 
 # use ccxt library to get data from bybit
 class Bybit:
@@ -59,11 +59,6 @@ class Bybit:
         count = count_rows(BybitDB)
         print(f"[BYBIT]Number of rows in the database: {count}")
 
-    @staticmethod
-    def get_data_by_params(instrument_name, interval='1h'):
-        data = get_data_by_params(BybitDB, instrument_name, interval)
-        return data
-
     # Fetch instrument names from Bybit
     def fetch_bybit_instrument_names():
         url = "https://api.bybit.com/v2/public/symbols"
@@ -86,6 +81,7 @@ class Bybit:
             print(f"[BYBIT]An error occurred while fetching instrument names: {e}")
             return []
     
+    # https://bybit-exchange.github.io/docs/api-explorer/v5/market/history-fund-rate
     def fetch_bybit_data(symbol, start_time, end_time, limit=200):
         url = 'https://api.bybit.com/derivatives/v3/public/funding/history-funding-rate'
         headers = {

@@ -19,105 +19,46 @@ class User(db.Model):
         return f'<User {self.username}>'
 
 # AevoDB model
-class AevoDB(Base):
+class BaseModel(Base):
+    __abstract__ = True
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, unique=True, nullable=False)
+    instrument_name = Column(String, nullable=False)
+    timestamp = Column(BigInteger, nullable=False)
+    funding_rate = Column(String, nullable=False)
+    mark_price = Column(String, nullable=True)
+    created_at = Column(DateTime, server_default=func.now())
+    updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now())
+
+    def __repr__(self):
+        return f"<{self.__class__.__name__}(instrument_name={self.instrument_name}, timestamp={self.timestamp}, funding_rate={self.funding_rate}, mark_price={self.mark_price})>"
+
+    def to_dict(self):
+        return {
+            'instrument_name': self.instrument_name,
+            'timestamp': self.timestamp,
+            'funding_rate': self.funding_rate,
+        }
+
+    def to_json(self):
+        return json.dumps(self.to_dict(), indent=4)
+
+
+# AevoDB model
+class AevoDB(BaseModel):
     __tablename__ = 'funding_data_aevo'
 
-    id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, unique=True, nullable=False)
-    instrument_name = db.Column(String, nullable=False)
-    timestamp = db.Column(BigInteger, nullable=False)
-    funding_rate = db.Column(String, nullable=False)
-    mark_price = db.Column(String)
-
-    created_at = db.Column(DateTime, server_default=func.now())
-    updated_at = db.Column(DateTime, server_default=func.now(), onupdate=func.now())
-
-    def __repr__(self):
-        return f"<AevoDB(instrument_name={self.instrument_name}, timestamp={self.timestamp}, funding_rate={self.funding_rate}, mark_price={self.mark_price})>"
-
-    def to_dict(self):
-        return {
-            'instrument_name': self.instrument_name,
-            'timestamp': self.timestamp,
-            'funding_rate': self.funding_rate,
-        }
-
-    def to_json(self):
-        return json.dumps(self.to_dict(), indent=4)
 
 # BybitDB model
-class BybitDB(Base):
+class BybitDB(BaseModel):
     __tablename__ = 'funding_data_bybit'
 
-    id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, unique=True, nullable=False)
-    instrument_name = db.Column(String, nullable=False)
-    timestamp = db.Column(BigInteger, nullable=False)
-    funding_rate = db.Column(String, nullable=False)
-    mark_price = db.Column(String)
-
-    created_at = db.Column(DateTime, server_default=func.now())
-    updated_at = db.Column(DateTime, server_default=func.now(), onupdate=func.now())
-
-    def __repr__(self):
-        return f"<BybitDB(instrument_name={self.instrument_name}, timestamp={self.timestamp}, funding_rate={self.funding_rate}, mark_price={self.mark_price})>"
-
-    def to_dict(self):
-        return {
-            'instrument_name': self.instrument_name,
-            'timestamp': self.timestamp,
-            'funding_rate': self.funding_rate,
-        }
-
-    def to_json(self):
-        return json.dumps(self.to_dict(), indent=4)
 
 # GateioDB model
-class GateioDB(Base):
+class GateioDB(BaseModel):
     __tablename__ = 'funding_data_gateio'
 
-    id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, unique=True, nullable=False)
-    instrument_name = db.Column(String, nullable=False)
-    timestamp = db.Column(BigInteger, nullable=False)
-    funding_rate = db.Column(String, nullable=False)
-    mark_price = db.Column(String)
-
-    created_at = db.Column(DateTime, server_default=func.now())
-    updated_at = db.Column(DateTime, server_default=func.now(), onupdate=func.now())
-
-    def __repr__(self):
-        return f"<GateioDB(instrument_name={self.instrument_name}, timestamp={self.timestamp}, funding_rate={self.funding_rate}, mark_price={self.mark_price})>"
-
-    def to_dict(self):
-        return {
-            'instrument_name': self.instrument_name,
-            'timestamp': self.timestamp,
-            'funding_rate': self.funding_rate,
-        }
-
-    def to_json(self):
-        return json.dumps(self.to_dict(), indent=4)
 
 # HyperliquidDB model
-class HyperliquidDB(Base):
+class HyperliquidDB(BaseModel):
     __tablename__ = 'funding_data_hyperliquid'
-
-    id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, unique=True, nullable=False)
-    instrument_name = db.Column(String, nullable=False)
-    timestamp = db.Column(BigInteger, nullable=False)
-    funding_rate = db.Column(String, nullable=False)
-    mark_price = db.Column(String)
-
-    created_at = db.Column(DateTime, server_default=func.now())
-    updated_at = db.Column(DateTime, server_default=func.now(), onupdate=func.now())
-
-    def __repr__(self):
-        return f"<HyperliquidDB(instrument_name={self.instrument_name}, timestamp={self.timestamp}, funding_rate={self.funding_rate}, mark_price={self.mark_price})>"
-
-    def to_dict(self):
-        return {
-            'instrument_name': self.instrument_name,
-            'timestamp': self.timestamp,
-            'funding_rate': self.funding_rate,
-        }
-
-    def to_json(self):
-        return json.dumps(self.to_dict(), indent=4)

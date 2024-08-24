@@ -26,7 +26,7 @@ def create_app():
     with app.app_context():
         db.create_all()  # This will create tables if they don't exist
         # Optionally, run db upgrade to ensure all migrations are applied
-        from flask_migrate import upgrade
-        upgrade()
+        # from flask_migrate import upgrade
+        # upgrade()
 
     return app

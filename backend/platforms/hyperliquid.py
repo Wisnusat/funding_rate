@@ -2,9 +2,9 @@ import requests
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from fake_useragent import UserAgent
-from db.models import HyperliquidDB
-from db.operations import save_to_database, delete_all_data, count_rows, get_data_by_params
-from utils.common import get_timeframe
+from app.db.models import HyperliquidDB
+from app.db.operations import save_to_database, delete_all_data, count_rows
+from app.utils import get_timeframe
 
 class Hyperliquid:
     @staticmethod
@@ -78,11 +78,7 @@ class Hyperliquid:
         print(f"[Hyperliquid]Number of rows in the database: {count}")
 
     @staticmethod
-    def get_data_by_params(instrument_name):
-        data = get_data_by_params(HyperliquidDB, instrument_name)
-        return data
-
-    @staticmethod
+    # https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/perpetuals#retrieve-historical-funding-rates
     def fetch_hyperliquid_data(symbol, start_time, end_time, limit=500):
         ua = UserAgent()
         url = 'https://api.hyperliquid.xyz/info'
