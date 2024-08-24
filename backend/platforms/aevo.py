@@ -1,9 +1,9 @@
 import requests
 import time, datetime
-from db.models import AevoDB
-from utils.common import get_timestamp_for_interval
+from app.db.models import AevoDB
+from app.utils import get_timestamp_for_interval
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from db.operations import save_to_database, delete_all_data, count_rows, get_data_by_params
+from app.db.operations import save_to_database, delete_all_data, count_rows
 
 class Aevo:
     @staticmethod
@@ -53,11 +53,6 @@ class Aevo:
     def count_rows():
         count = count_rows(AevoDB)
         print(f"[AEVO]Number of rows in the database: {count}")
-
-    @staticmethod
-    def get_data_by_params(instrument_name, interval='1h'):
-        data = get_data_by_params(AevoDB, instrument_name, interval)
-        return data
 
     # Fetch instrument names from AEVO
     def fetch_aevo_instrument_names():

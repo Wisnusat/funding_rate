@@ -1,9 +1,9 @@
 import requests
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from db.models import GateioDB  # Adjusted to reflect the correct database model for Gate.io data
-from db.operations import save_to_database, delete_all_data, count_rows, get_data_by_params
-from utils.common import get_timeframe
+from app.db.models import GateioDB  # Adjusted to reflect the correct database model for Gate.io data
+from app.db.operations import save_to_database, delete_all_data, count_rows
+from app.utils import get_timeframe
 
 class Gateio:
     @staticmethod
@@ -74,11 +74,6 @@ class Gateio:
     def count_rows():
         count = count_rows(GateioDB)
         print(f"[Gateio]Number of rows in the database: {count}")
-
-    @staticmethod
-    def get_data_by_params(instrument_name):
-        data = get_data_by_params(GateioDB, instrument_name)
-        return data
 
     @staticmethod
     def fetch_gateio_data(symbol, limit=1):

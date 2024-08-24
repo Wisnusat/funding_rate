@@ -7,6 +7,24 @@ def load_tickers():
         data = json.load(f)
     return data
 
+def get_timestamp_for_interval(interval):
+    current_time = datetime.utcnow()
+    end_time = int(current_time.timestamp() * 1e9)  # API might need seconds; adjust accordingly
+
+    intervals = {
+        '1h': 3600,
+        '1d': 86400,
+        '7d': 7 * 86400,
+        '1M': 30 * 86400,
+        '1y': 365 * 86400
+    }
+
+    if interval not in intervals:
+        raise ValueError("Invalid interval")
+
+    start_time = end_time - int(intervals[interval] * 1e9)
+    return int(start_time), int(end_time)
+
 def get_timeframe(timeframe: str):
     now = datetime.now()
     if timeframe == '1h':

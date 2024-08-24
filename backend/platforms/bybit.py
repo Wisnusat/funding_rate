@@ -4,9 +4,9 @@ import time, datetime
 import logging
 import json
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from db.models import BybitDB
-from db.operations import save_to_database, delete_all_data, count_rows, get_data_by_params
-from utils.common import get_timeframe
+from app.db.models import BybitDB
+from app.db.operations import save_to_database, delete_all_data, count_rows
+from app.utils import get_timeframe
 
 # use ccxt library to get data from bybit
 class Bybit:
@@ -58,11 +58,6 @@ class Bybit:
     def count_rows():
         count = count_rows(BybitDB)
         print(f"[BYBIT]Number of rows in the database: {count}")
-
-    @staticmethod
-    def get_data_by_params(instrument_name, interval='1h'):
-        data = get_data_by_params(BybitDB, instrument_name, interval)
-        return data
 
     # Fetch instrument names from Bybit
     def fetch_bybit_instrument_names():
