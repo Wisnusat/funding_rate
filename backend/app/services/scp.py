@@ -14,7 +14,7 @@ def get_coins(keyword=None):
         logo_url, name = get_logo_url(ticker)
         data.append({
             "coin": ticker,
-            "logo": logo_url or "https://cryptologos.cc/logos/default-logo.png",
+            "logo": logo_url or "https://www.imghippo.com/i/ZBzQI1724488120.webp",
             "name": name or ticker
         })
 
@@ -66,7 +66,7 @@ def scrapper_with_pagination(page=1, limit=10, time='1d', sort_order='asc', coin
     # Construct the data array with the required fields
     data = [{
         "coin": ticker,
-        "logo": logo_url or "https://cryptologos.cc/logos/default-logo.png",
+        "logo": logo_url or "https://www.imghippo.com/i/ZBzQI1724488120.webp",
         "name": name or ticker,
         "funding": funding_data
     } for ticker, funding_data in paginated_items for logo_url, name in [get_logo_url(ticker)]]
