@@ -112,7 +112,7 @@ class Gateio:
                 for entry in data:
                     entry['symbol'] = symbol.upper()
 
-                print(f"[GATEIO]Data fetched for {symbol}")
+                # print(f"[GATEIO]Data fetched for {symbol}")
                 return data
 
             except requests.exceptions.HTTPError as e:
