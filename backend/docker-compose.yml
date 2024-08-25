@@ -17,6 +17,18 @@ services:
       - 1.1.1.1
       - 1.0.0.1
 
+  scraper:
+    build:
+      context: .
+      dockerfile: Dockerfile.scraper  # Assuming you have a separate Dockerfile for the scraper
+    environment:
+      DATABASE_URL: postgresql://admindev:admindev@db:5432/jp_funding_rate
+    depends_on:
+      - db
+    dns:
+      - 1.1.1.1
+      - 1.0.0.1
+
   db:
     image: postgres:13
     environment:

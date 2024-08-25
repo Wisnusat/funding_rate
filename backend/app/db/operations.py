@@ -106,7 +106,7 @@ def build_base_query(session, model_class, since, until, keyword):
         func.sum(cast(model_class.funding_rate, Numeric)).label('total_funding_rate')
     ).filter(
         model_class.timestamp >= since,
-        model_class.timestamp <= until
+        # model_class.timestamp <= until
     )
     if keyword:
         query = query.filter(model_class.instrument_name == keyword.upper())

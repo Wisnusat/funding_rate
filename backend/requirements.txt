@@ -42,6 +42,7 @@ PyJWT==2.8.0
 python-dateutil==2.9.0.post0
 python-dotenv==1.0.1
 pytz==2024.1
+pywatchman==2.0.0
 requests==2.32.3
 schedule==1.2.2
 six==1.16.0

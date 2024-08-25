@@ -1,6 +1,7 @@
 import os
 import time
 import schedule
+import logging
 from datetime import datetime
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from platforms.aevo import Aevo
@@ -8,6 +9,33 @@ from platforms.bybit import Bybit
 from platforms.hyperliquid import Hyperliquid
 from platforms.gateio import Gateio
 from dotenv import load_dotenv
+
+# KOYEB PURPOSE
+from http.server import SimpleHTTPRequestHandler, HTTPServer
+import threading
+
+def run_http_server():
+    handler = SimpleHTTPRequestHandler
+    httpd = HTTPServer(('0.0.0.0', 8000), handler)
+    httpd.serve_forever()
+
+# Start the HTTP server in a separate thread
+server_thread = threading.Thread(target=run_http_server)
+server_thread.daemon = True
+server_thread.start()
+# ===============================================================
+
+# Set up logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.FileHandler("scraper.log"),
+        logging.StreamHandler()
+    ]
+)
+
+logger = logging.getLogger(__name__)
 
 # Load environment variables
 load_dotenv()
@@ -31,14 +59,14 @@ interval_mapping = {
 
 def run_scrapers_sequential(interval):
     """Run the scrapers sequentially."""
-    scrapers = [Gateio()]
+    scrapers = [Aevo(), Bybit(), Hyperliquid(), Gateio()]
     for scraper in scrapers:
         try:
-            print(f"\nRunning {scraper.__class__.__name__} scraper...\n")
+            logger.info(f"Running {scraper.__class__.__name__} scraper...")
             scraper.run(interval)
-            print(f"\n{scraper.__class__.__name__} scraper completed.\n")
+            logger.info(f"{scraper.__class__.__name__} scraper completed.")
         except Exception as e:
-            print(f"Error occurred in {scraper.__class__.__name__} scraper: {e}")
+            logger.error(f"Error occurred in {scraper.__class__.__name__} scraper: {e}")
 
 def run_scrapers_parallel(interval):
     """Run the scrapers in parallel."""
@@ -48,8 +76,9 @@ def run_scrapers_parallel(interval):
         for future in as_completed(futures):
             try:
                 future.result()
+                logger.info("Scraper completed successfully.")
             except Exception as e:
-                print(f"Error occurred: {e}")
+                logger.error(f"Error occurred: {e}")
 
 def countdown_to_next_run(next_run_time):
     while True:
@@ -57,9 +86,8 @@ def countdown_to_next_run(next_run_time):
         remaining_time = next_run_time - now
         if remaining_time.total_seconds() <= 0:
             break
-        print(f"\rTime until next run: {str(remaining_time).split('.')[0]}", end="")
+        logger.info(f"Time until next run: {str(remaining_time).split('.')[0]}")
         time.sleep(1)
-    print("\n")
 
 def schedule_scrapers():
     """Set up the schedule based on environment variables."""
@@ -82,7 +110,7 @@ def main():
     first_run_interval = '1y' if FIRST_RUN == 'y' else interval_mapping.get(INTERVAL_CHOICE, '1h')
 
     # Run the scraper for the first time
-    print(f"Starting the first run with interval: {first_run_interval}")
+    logger.info(f"Starting the first run with interval: {first_run_interval}")
     if EXECUTION_MODE == '1':
         run_scrapers_sequential(first_run_interval)
     elif EXECUTION_MODE == '2':
@@ -94,7 +122,7 @@ def main():
     # Keep the script running and check for scheduled tasks
     while True:
         next_run_time = schedule.next_run()
-        print(f"\nNext run scheduled at: {next_run_time}")
+        logger.info(f"Next run scheduled at: {next_run_time}")
         countdown_to_next_run(next_run_time)
         schedule.run_pending()
 
