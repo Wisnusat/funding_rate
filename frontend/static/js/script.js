@@ -20,7 +20,7 @@ const dropdownLoading = document.getElementById('dropdownLoading');
 const calculateLoading = document.getElementById('calculateLoading');
 const calculateButton = document.querySelector('.calculate-button');
 
-let currentTimeFilter = '1h'; // Default time filter
+let currentTimeFilter = '1y'; // Default time filter
 let searchQuery = ''; // Default search query
 let currentPage = 1;
 const limitPerPage = 20;
