@@ -1,4 +1,5 @@
-const baseUrl = 'https://77f2-104-28-247-133.ngrok-free.app';
+
+const baseUrl = 'https://deep-flss-suryalab-9cf66ab5.koyeb.app';
 
 export const API_CONFIG = {
     endpoints: {

@@ -42,6 +42,20 @@ def delete_all_data(model_class):
             session.rollback()
             print(f"An error occurred: {e}")
 
+def delete_old_data(model_class):
+    with Session() as session:
+        try:
+            # Menghitung batas waktu 1 tahun yang lalu dari waktu sekarang
+            one_year_ago = int((datetime.now() - timedelta(days=366)).timestamp())
+
+            # Menghapus data yang memiliki timestamp lebih dari 1 tahun
+            session.query(model_class).filter(model_class.timestamp < one_year_ago).delete()
+            session.commit()
+            print("Old data deleted successfully")
+        except Exception as e:
+            session.rollback()
+            print(f"An error occurred while deleting old data: {e}")
+
 def count_rows(model_class):
     with Session() as session:
         return session.query(model_class).count()

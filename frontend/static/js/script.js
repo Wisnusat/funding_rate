@@ -2,8 +2,8 @@ import { fetchCoin, fetchCoinList } from "../../config/apiService.js";
 
 const loadingContainer = document.getElementById('loadingContainer');
 const loadingSpinner = document.getElementById('loadingSpinner');
-const CHEVRON_GREEN = '/frontend/assets/icon/chevron-green.png';
-const CHEVRON_RED = '/frontend/assets/icon/chevron-red.png';
+const CHEVRON_GREEN = '/assets/icon/chevron-green.png';
+const CHEVRON_RED = '/assets/icon/chevron-red.png';
 const tableBody = document.getElementById('coinTableBody');
 const refreshButton = document.querySelector('.refresh-button');
 const searchBarMobile = document.getElementById('searchBarMobile');
@@ -49,7 +49,7 @@ const formatToFiveDecimalPlaces = (numberString) => {
 const renderFundRate = (rate) => {
     if (rate !== null && rate !== undefined) {
         const icon = rate.includes('-') ? CHEVRON_RED : CHEVRON_GREEN;
-        return `<img src="/frontend/assets/icon/loading-placeholder.png" data-src="${icon}" alt="${rate.includes('-') ? 'Down' : 'Up'}" class="chevron-icon lazy"> ${formatToFiveDecimalPlaces(rate)}`;
+        return `<img src="/assets/icon/loading-placeholder.png" data-src="${icon}" alt="${rate.includes('-') ? 'Down' : 'Up'}" class="chevron-icon lazy"> ${formatToFiveDecimalPlaces(rate)}`;
     }
     return '-';
 };
@@ -64,9 +64,9 @@ const calculateAverage = (values) => {
 const renderTableRow = (coin, funding) => {
     const average = calculateAverage([funding.aevo, funding.hyperliquid, funding.bybit, funding.gateio]);
     return `
-        <tr onclick="window.location.href='/frontend/detail.html?name=${coin.name.toLowerCase()}&coin=${coin.coin}&logo=${coin.logo}'" style="cursor:pointer;">
+        <tr onclick="window.location.href='/detail.html?name=${coin.name ? coin.name.toLowerCase() : 'none'}&coin=${coin.coin}&logo=${coin.logo}'" style="cursor:pointer;">
             <td class="sticky-col">
-                <img src="/frontend/assets/icon/loading-placeholder.png" data-src="${coin.logo}" class="coin-logo lazy" onerror="this.onerror=null;this.src='https://cryptologos.cc/logos/default-logo.png';">
+                <img src="/assets/icon/loading-placeholder.png" data-src="${coin.logo}" class="coin-logo lazy">
                 ${coin.coin}
             </td>
             <td class="${average !== '-' && average.includes('-') ? 'down' : average !== '-' ? 'up' : ''}">${renderFundRate(average)}</td>
@@ -121,7 +121,7 @@ const closeDrawerAndOverlay = () => {
 const logout = (event) => {
     event.preventDefault(); // Prevent the default link behavior
     document.cookie = 'token=; Max-Age=0; path=/; domain=' + window.location.hostname; // Delete the authentication token cookie
-    window.location.href = '/frontend/login.html'; // Redirect to the login page
+    window.location.href = '/login.html'; // Redirect to the login page
 };
 
 const setupEventListeners = () => {
