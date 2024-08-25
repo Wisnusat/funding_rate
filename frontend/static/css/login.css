@@ -101,7 +101,7 @@ body {
 /* Responsive styling */
 @media (max-width: 768px) {
     body {
-        background-image: url('/frontend/assets/image/login-illustration.png');
+        background-image: url('/assets/image/login-illustration.png');
         background-repeat: no-repeat;
         background-size: cover;
     }

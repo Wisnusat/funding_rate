@@ -10,7 +10,7 @@ function getCookie(name) {
 function checkAuth() {
     const token = getCookie('token');
     if (!token) {
-        window.location.href = '/frontend/login.html'; // Redirect to the login page if not authenticated
+        window.location.href = '/login.html'; // Redirect to the login page if not authenticated
     }
 }
 
@@ -22,7 +22,7 @@ function deleteCookie(name) {
 // Function to log the user out
 function logout() {
     deleteCookie('token'); // Delete the authentication token cookie
-    window.location.href = '/frontend/login.html'; // Redirect to the login page
+    window.location.href = '/login.html'; // Redirect to the login page
 }
 
 // Call checkAuth on page load
