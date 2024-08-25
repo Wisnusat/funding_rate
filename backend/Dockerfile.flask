@@ -2,7 +2,12 @@
 FROM python:3.11-slim
 
 # Install ping, curl, and other necessary utilities (optional)
-RUN apt-get update && apt-get install -y iputils-ping curl && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    gcc \
+    iputils-ping \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
 
 # Set the working directory
 WORKDIR /app

@@ -57,11 +57,18 @@ def scrapper_with_pagination(page=1, limit=10, time='1d', sort_order='asc', coin
     if not aggregated_data:
         aggregated_data = {ticker: {source: None for source in data_sources} for ticker in unique_tickers}
 
-    # Apply pagination
-    total_items = len(aggregated_data)
-    start_index = (page - 1) * limit
-    end_index = start_index + limit
-    paginated_items = list(aggregated_data.items())[start_index:end_index]
+    # Sort tickers by the number of non-null data entries (descending)
+    sorted_aggregated_data = sorted(
+        aggregated_data.items(),
+        key=lambda item: sum(1 for value in item[1].values() if value is not None),
+        reverse=True
+    )
+
+    # Apply pagination (Commented out since pagination is disabled)
+    total_items = len(sorted_aggregated_data)
+    # start_index = (page - 1) * limit
+    # end_index = start_index + limit
+    # paginated_items = sorted_aggregated_data[start_index:end_index]
 
     # Construct the data array with the required fields
     data = [{
@@ -69,20 +76,24 @@ def scrapper_with_pagination(page=1, limit=10, time='1d', sort_order='asc', coin
         "logo": logo_url or "https://iili.io/dXFbXdN.th.jpg",
         "name": name or ticker,
         "funding": funding_data
-    } for ticker, funding_data in paginated_items for logo_url, name in [get_logo_url(ticker)]]
+    } for ticker, funding_data in sorted_aggregated_data for logo_url, name in [get_logo_url(ticker)]]
+    # } for ticker, funding_data in paginated_items for logo_url, name in [get_logo_url(ticker)]] # Uncomment for pagination
 
     # Meta information
-    total_pages = (total_items + limit - 1) // limit
-    is_next_page = page < total_pages
+    # total_pages = (total_items + limit - 1) // limit
+    # is_next_page = page < total_pages
 
     meta = {
         "filter": {"time": time, "coin": coin or "All", "sortOrder": sort_order},
         "date": datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S UTC"),
-        "isNextPage": is_next_page,
-        "page": page,
-        "perPage": limit,
+        "isNextPage": False,  # Dummy value
+        "page": 1,  # Dummy value
+        # "perPage": limit, # Uncomment for pagination
+        "perPage": total_items,  # Dummy value
         "totalItems": total_items,
-        "totalPages": total_pages
+        "totalPages": 1  # Dummy value
     }
 
     return {"data": data, "meta": meta}
+
+

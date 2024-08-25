@@ -28,7 +28,7 @@ def get_timestamp_for_interval(interval):
 def get_timeframe(timeframe: str):
     now = datetime.now()
     if timeframe == '1h':
-        since = now - timedelta(hours=1)
+        since = now - timedelta(hours=2)
     elif timeframe == '1d':
         since = now - timedelta(days=1)
     elif timeframe == '7d':
