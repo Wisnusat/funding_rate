@@ -13,6 +13,7 @@ def get_timestamp_for_interval(interval):
 
     intervals = {
         '1h': 3600,
+        '8h': 8 * 3600,
         '1d': 86400,
         '7d': 7 * 86400,
         '1M': 30 * 86400,
@@ -29,6 +30,8 @@ def get_timeframe(timeframe: str):
     now = datetime.now()
     if timeframe == '1h':
         since = now - timedelta(hours=2)
+    elif timeframe == '8h':
+        since = now - timedelta(hours=8)
     elif timeframe == '1d':
         since = now - timedelta(days=1)
     elif timeframe == '7d':
@@ -38,7 +41,7 @@ def get_timeframe(timeframe: str):
     elif timeframe == '1y':
         since = now - timedelta(days=365)
     else:
-        raise ValueError("Unsupported timeframe. Use '1h', '1d', '7d', '1M', or '1y'.")
+        raise ValueError("Unsupported timeframe. Use '1h', '8h', '1d', '7d', '1M', or '1y'.")
 
     since_timestamp = int(since.timestamp() * 1000)
     until_timestamp = int(now.timestamp() * 1000)
