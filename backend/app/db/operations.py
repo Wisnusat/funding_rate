@@ -94,8 +94,6 @@ def get_tickers(keyword=None):
 def adjust_timeframe(model_class, since, until):
     if model_class == AevoDB:
         since, until = since * 1000000, until * 1000000  # Convert seconds to microseconds
-    elif model_class == GateioDB:
-        since, until = since / 1000, until / 1000  # Convert milliseconds to seconds
     # HyperliquidDB assumed to use milliseconds, no changes needed
     return since, until
 
@@ -103,7 +101,8 @@ def build_base_query(session, model_class, since, until, keyword):
     since, until = adjust_timeframe(model_class, since, until)
     query = session.query(
         model_class.instrument_name,
-        func.sum(cast(model_class.funding_rate, Numeric)).label('total_funding_rate')
+        # Multiply the sum of the funding rate by 100 to get the percentage
+        (func.sum(cast(model_class.funding_rate, Numeric)) * 100).label('total_funding_rate_percentage')
     ).filter(
         model_class.timestamp >= since,
         # model_class.timestamp <= until

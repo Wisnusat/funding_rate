@@ -1,6 +1,6 @@
 import json
 import re
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 def load_tickers():
     with open("data_const/ticker.json", 'r', encoding='utf-8') as f:
@@ -61,3 +61,19 @@ def get_logo_url(symbol, file_path='data_const/crypto_logos.json'):
         return logo_url, coin['name']
     
     return None, None
+
+
+def time_converter(timestamp):
+    time_in_hour = {
+        '1h': 1,
+        '8h': 8,
+        '1d': 24,
+        '7d': 168,
+        '1M': 720,
+        '1y': 8760
+    }
+
+    time_delta = datetime.now(timezone.utc) - timedelta(hours=time_in_hour[timestamp])
+    since = int(time_delta.timestamp() * 1000)
+
+    return since
