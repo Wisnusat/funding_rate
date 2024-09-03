@@ -12,7 +12,6 @@ class Bybit:
     @staticmethod
     def run(interval='1h'):
         bybit_assets = Bybit.fetch_bybit_instrument_names()
-        print(bybit_assets)
         # bybit_assets = ['BTC/USDT:USDT', 'ETH/USDT:USDT']
         print(f"[BYBIT]Running scraper for {interval} interval with assets: {len(bybit_assets)}")
         
@@ -69,12 +68,12 @@ class Bybit:
                     break
                 all_data.extend(data)
                 since = data[-1]['timestamp'] + 1  # Move to the next timestamp
-                print(f"[BYBIT][{symbol}]: Fetched {len(data)} entries")
+                # print(f"[BYBIT][{symbol}]: Fetched {len(data)} entries")
                 # If we reached the end_time, stop the loop
                 if since >= int(datetime.now(timezone.utc).timestamp() * 1000):
                     break
             except Exception as e:
-                print(f"[BYBIT][{symbol}]: {e}")
+                # print(f"[BYBIT][{symbol}]: {e}")
                 break
 
         return all_data

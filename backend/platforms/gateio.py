@@ -63,7 +63,8 @@ class Gateio:
         try:
             data = exchange.fetch_funding_rate_history(f'{symbol}:USDT', since, limit=1000)
         except Exception as e:
-            print(f"[GATE][{symbol}]: {e}")
+            # print(f"[GATE][{symbol}]: {e}")
+            f"[Gate.io] Error fetching funding rate history"
 
         return data
 
