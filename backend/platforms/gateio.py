@@ -1,23 +1,26 @@
-import requests
+import ccxt
+import pandas as pd
+from datetime import datetime, timezone, timedelta
 import time
+from sqlalchemy import create_engine
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from app.db.models import GateioDB  # Adjusted to reflect the correct database model for Gate.io data
+from app.utils import get_timeframe, time_converter
+from app.db.models import GateioDB
 from app.db.operations import save_to_database, delete_all_data, count_rows
-from app.utils import get_timeframe
 
 class Gateio:
     @staticmethod
-    def run(limit=1):
-        gateio_assets = Gateio.fetch_gateio_instrument_name()
-        # gateio_assets = ["btc"]
-        print(f"[Gateio]Running scraper for {limit} limit with assets: {len(gateio_assets)}")
-
+    def run(interval='1h'):
+        gateio_assets = Gateio.fetch_gateio_instrument_names()
+        # gateio_assets = ['BTC/USDT:USDT', 'ETH/USDT:USDT']
+        print(f"[GATE]Running scraper for {interval} interval with assets: {len(gateio_assets)}")
+        
         # Start timing
         start_time = time.time()
-
-        # Fetch and process data from Gateio
-        gateio_data = Gateio.runWithThreading(Gateio.fetch_gateio_data, gateio_assets, limit)
         
+        # Scrape data from Gateio
+        gateio_data = Gateio.runWithThreading(Gateio.fetch_gateio_data, interval, gateio_assets)
+
         # Process data to match the expected format
         processed_data = Gateio.process_gateio_data(gateio_data)
 
@@ -26,126 +29,51 @@ class Gateio:
         duration = end_time - start_time
 
         # Display duration
-        print(f"[Gateio]Data scraping completed in {duration:.2f} seconds.")
+        print(f"[GATE]Data scraping completed in {duration:.2f} seconds.")
 
         # Save to database
         save_to_database(processed_data, GateioDB)
 
     @staticmethod
-    def fetch_gateio_instrument_name():
-        url = 'https://api.gateio.ws/api/v4/spot/currency_pairs'
-        headers = {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json'
-        }
-
-        try:
-            response = requests.get(url, headers=headers)
-            response.raise_for_status()  # Raise HTTPError for bad responses
-            data = response.json()
-            
-            instrument_names = [instrument['base'] for instrument in data]
-            return instrument_names
-
-        except requests.RequestException as e:
-            print(f"[Gateio]An error occurred while fetching instrument names: {e}")
-            return []
-
-    @staticmethod
     def process_gateio_data(data):
         processed_data = []
         for entry in data:
-            processed_entry = [                
-                entry.get('symbol'),
-                entry.get('t'),
-                entry.get('r'),
-                None  # Placeholder for additional data or calculations if needed
+            coin_symbol = entry['symbol'].split('/')[0]
+            processed_entry = [
+                coin_symbol,
+                entry['timestamp'],
+                entry['fundingRate'],
+                None
             ]
             processed_data.append(processed_entry)
         return processed_data
 
-    # Delete all data from the database
     @staticmethod
-    def delete_all_data():
-        delete_all_data(GateioDB)
-
-    # Count the number of rows in the database
+    def fetch_gateio_instrument_names():
+        exchange = ccxt.gate()
+        exchange.load_markets()
+        # Return list of symbols that contain 'USDT'
+        return [pair for pair in exchange.markets if 'USDT' in pair]
+    
     @staticmethod
-    def count_rows():
-        count = count_rows(GateioDB)
-        print(f"[Gateio]Number of rows in the database: {count}")
+    def fetch_gateio_data(symbol, since):
+        exchange = ccxt.gate()
+        since = time_converter(since)
+        data = []
+        try:
+            data = exchange.fetch_funding_rate_history(f'{symbol}:USDT', since, limit=1000)
+        except Exception as e:
+            # print(f"[GATE][{symbol}]: {e}")
+            f"[Gate.io] Error fetching funding rate history"
 
-    @staticmethod
-    # https://www.gate.io/docs/developers/apiv4/#funding-rate-history 
-    def fetch_gateio_data(symbol, limit):
-        url = 'https://api.gateio.ws/api/v4/futures/usdt/funding_rate'
-        headers = {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json'
-        }
-
-        if limit == '1h':
-            limit = 10
-        else:
-            limit = 100
-        
-        params = {
-            'contract': symbol.upper() + "_USDT",
-            'limit': limit
-        }
-        
-        retries = 0
-        max_retries = 2
-        backoff_factor = 1.5  # Exponential backoff factor
-
-        while retries < max_retries:
-            try:
-                response = requests.get(url, headers=headers, params=params)
-                response.raise_for_status()  # Raise HTTPError for bad responses
-                data = response.json()
-
-                if not data:
-                    print(f"[Gateio]No data returned for {symbol}.")
-                    return []
-
-                # Add the symbol to each entry in the returned data
-                for entry in data:
-                    entry['symbol'] = symbol.upper()
-
-                # print(f"[GATEIO]Data fetched for {symbol}")
-                return data
-
-            except requests.exceptions.HTTPError as e:
-                if response.status_code == 400:
-                    # print(f"Bad Request (400) for symbol: {symbol}. Skipping this symbol.")
-                    return []  # Skip this symbol entirely
-                else:
-                    print(f"[Gateio]Request failed: {e}")
-                    retries += 1
-                    if retries >= max_retries:
-                        print("[Gateio]Max retries reached. Returning what we have so far.")
-                        return []  # Return what we have so far if retries are exhausted
-                    wait_time = backoff_factor ** retries
-                    time.sleep(wait_time)
-
-            except requests.RequestException as e:
-                print(f"[Gateio]Request failed: {e}")
-                retries += 1
-                if retries >= max_retries:
-                    print("[Gateio]Max retries reached. Returning what we have so far.")
-                    return []  # Return what we have so far if retries are exhausted
-                wait_time = backoff_factor ** retries
-                time.sleep(wait_time)
-
-        return []
-
+        return data
 
     @staticmethod
-    def runWithThreading(fetch_data_function, instrument_names, limit):
+    def runWithThreading(fetch_data_function, since, instrument_names):
         results = []
         with ThreadPoolExecutor(max_workers=5) as executor:
             futures = [
-                executor.submit(fetch_data_function, instrument_name, limit)
+                executor.submit(fetch_data_function, instrument_name, since)
                 for instrument_name in instrument_names
             ]
             for future in as_completed(futures):
