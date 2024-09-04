@@ -145,10 +145,16 @@ body {
 .details-section ul li span {
     font-weight: bold;
     text-align: right;
+    margin-left: 20px;
 }
 
 .down {
     color: red;
+}
+
+#description {
+    margin-top: 8px;
+    width: 70%;
 }
 
 @media (max-width: 768px) {
@@ -182,5 +188,9 @@ body {
 
     .details-section {
         padding: 20px;
+    }
+
+    #description {
+        display: none;
     }
 }

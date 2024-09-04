@@ -47,11 +47,14 @@ const register = async (username, password) => {
 };
 
 const fetchDetailCoin = async (coin) => {
+    const token = getCookie('token'); // Ambil token dari cookie
+
     try {
         const response = await fetch(API_CONFIG.endpoints.detailCoin(coin), {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
             },
         });
 
@@ -61,7 +64,7 @@ const fetchDetailCoin = async (coin) => {
         }
 
         const data = await response.json();
-        return data;
+        return data.data;
     } catch (error) {
         console.error('Error fetching coin details:', error);
         return { error: true, message: error.message };

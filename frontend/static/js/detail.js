@@ -11,7 +11,6 @@ document.addEventListener("DOMContentLoaded", () => {
     };
 
     const coinSymbol = getUrlParameter('coin', 'BTC');
-    const coinName = getUrlParameter('name', 'BTC');
 
     const renderChart = (symbol) => {
         const tradingViewConfig = {
@@ -61,39 +60,31 @@ document.addEventListener("DOMContentLoaded", () => {
     renderChart(coinSymbol);
 
     const renderDetailData = (data) => {
-        const price = `$${data.market_data.current_price.usd.toLocaleString()}`;
-        const marketCap = `$${data.market_data.market_cap.usd.toLocaleString()}`;
-        const volume = `$${data.market_data.total_volume.usd.toLocaleString()}`;
-        const circulatingSupply = `${data.market_data.circulating_supply.toLocaleString()} ${coin}`;
-        const totalSupply = `${data.market_data.total_supply.toLocaleString()} ${coin}`;
-        const marketCapRank = `#${data.market_data.market_cap_rank}`;
-        const ath = `$${data.market_data.ath.usd.toLocaleString()}`;
-        const atl = `$${data.market_data.atl.usd.toLocaleString()}`;
+        const coinData = data[coinSymbol];
+        const marketCap = `${coinData.self_reported_market_cap.toLocaleString()}`;
+        const circulatingSupply = `${coinData.self_reported_circulating_supply.toLocaleString()} ${coinSymbol}`; // 'APT' or other dynamic coin symbol
+        const dateAdded = new Date(coinData.date_added).toLocaleDateString(); // Formatting date of when coin was added
+        const website = coinData.urls.website[0]; // Official website URL
+        const description = coinData.description;
 
-        document.getElementById("price").innerText = price;
         document.getElementById("market-cap").innerText = marketCap;
-        document.getElementById("volume").innerText = volume;
         document.getElementById("circulating-supply").innerText = circulatingSupply;
-        document.getElementById("total-supply").innerText = totalSupply;
-        document.getElementById("market-cap-rank").innerText = marketCapRank;
-        document.getElementById("ath").innerText = ath;
-        document.getElementById("atl").innerText = atl;
+        document.getElementById("date-added").innerText = dateAdded;
+        document.getElementById("website").innerText = website;
+        document.getElementById("description").innerText = description || "-";
     }
 
     const renderDetailFailed = (error) => {
         console.error("Error fetching coin data:", error);
         // In case of any other errors, display "-"
-        document.getElementById("price").innerText = "-";
         document.getElementById("market-cap").innerText = "-";
-        document.getElementById("volume").innerText = "-";
         document.getElementById("circulating-supply").innerText = "-";
-        document.getElementById("total-supply").innerText = "-";
-        document.getElementById("market-cap-rank").innerText = "-";
-        document.getElementById("ath").innerText = "-";
-        document.getElementById("atl").innerText = "-";
+        document.getElementById("date-added").innerText = "-";
+        document.getElementById("website").innerText = "-";
+        document.getElementById("description").innerText = "-";
     }
 
-    fetchDetailCoin(coinName)
+    fetchDetailCoin(coinSymbol)
         .then(data => renderDetailData(data))
         .catch(error => renderDetailFailed(error));
 });
