@@ -37,11 +37,11 @@ const showErrorNotification = (message) => {
     }, 3000); // Hide after 3 seconds
 };
 
-const formatToFiveDecimalPlaces = (numberString) => {
+const formatToFourDecimalPlaces = (numberString) => {
     const number = parseFloat(numberString);
     const parts = numberString.split('.');
-    if (parts.length > 1 && parts[1].length > 5) {
-        return number.toFixed(5);
+    if (parts.length > 1 && parts[1].length > 4) {
+        return number.toFixed(4);
     }
     return numberString;
 };
@@ -49,7 +49,7 @@ const formatToFiveDecimalPlaces = (numberString) => {
 const renderFundRate = (rate) => {
     if (rate !== null && rate !== undefined) {
         const icon = rate.includes('-') ? CHEVRON_RED : CHEVRON_GREEN;
-        return `<img src="/assets/icon/loading-placeholder.png" data-src="${icon}" alt="${rate.includes('-') ? 'Down' : 'Up'}" class="chevron-icon lazy"> ${formatToFiveDecimalPlaces(rate)}`;
+        return `<img src="/assets/icon/loading-placeholder.png" data-src="${icon}" alt="${rate.includes('-') ? 'Down' : 'Up'}" class="chevron-icon lazy"> ${formatToFourDecimalPlaces(rate)}%`;
     }
     return '-';
 };
@@ -138,6 +138,7 @@ const setupEventListeners = () => {
     logoutLink.addEventListener('click', logout);
 
     searchBarMobile.addEventListener('input', () => {
+        isNextPageAvailable = true;
         debounce(() => {
             searchQuery = searchBarMobile.value;
             allCoinData = [];
@@ -152,6 +153,7 @@ const setupEventListeners = () => {
     });
     
     searchBarDesktop.addEventListener('input', () => {
+        isNextPageAvailable = true;
         debounce(() => {
             searchQuery = searchBarDesktop.value;
             allCoinData = [];
@@ -159,7 +161,6 @@ const setupEventListeners = () => {
             if (searchQuery) {
                 filterAndRenderData(); // Filter and render data when the search query changes
             } else {
-                isNextPageAvailable = true;
                 refreshData(); // Refresh data if search query is cleared
             }
         }, 300); // Debounce delay of 300ms
@@ -266,6 +267,7 @@ const observer = new IntersectionObserver(async (entries) => {
 }, observerOptions);
 
 const refreshData = () => {
+    isNextPageAvailable = true;
     currentPage = 1;
     allCoinData = []; // Clear existing data
     tableBody.innerHTML = '';

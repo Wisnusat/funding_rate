@@ -16,7 +16,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const renderChart = (symbol) => {
         const tradingViewConfig = {
             autosize: true,
-            symbol: `CRYPTOCAP:${symbol}`,
+            symbol: `${symbol}USDT`,
             interval: "D",
             timezone: "Etc/UTC",
             theme: "light",

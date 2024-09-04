@@ -430,6 +430,7 @@ table td {
 .loadingContainer {
     display: flex;
     align-items: center;
+    margin-top: 4px;
 }
 
 .loadingText {
@@ -646,10 +647,11 @@ table td {
 
     .filter {
         display: flex;
-        margin-bottom: 14px;
-        flex-direction: row-reverse;
+        margin-bottom: 0px;
+        flex-direction: column;
         justify-content: start;
-        gap: 18px;
+        align-items: start;
+        gap: 10px;
     }
 
     .time-filters {
