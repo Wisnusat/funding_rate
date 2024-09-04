@@ -61,11 +61,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const renderDetailData = (data) => {
         const coinData = data[coinSymbol];
-        const marketCap = `${coinData.self_reported_market_cap.toLocaleString()}`;
-        const circulatingSupply = `${coinData.self_reported_circulating_supply.toLocaleString()} ${coinSymbol}`; // 'APT' or other dynamic coin symbol
-        const dateAdded = new Date(coinData.date_added).toLocaleDateString(); // Formatting date of when coin was added
-        const website = coinData.urls.website[0]; // Official website URL
-        const description = coinData.description;
+        const marketCap = coinData.self_reported_market_cap || "-";
+        const circulatingSupply = `${coinData.self_reported_circulating_supply || "-"} ${coinData.self_reported_circulating_supply ? coinSymbol : ''}`; // 'APT' or other dynamic coin symbol
+        const dateAdded = new Date(coinData.date_added).toLocaleDateString() || "-"; // Formatting date of when coin was added
+        const website = coinData.urls.website[0] || "-"; // Official website URL
+        const description = coinData.description || "-";
+
 
         document.getElementById("market-cap").innerText = marketCap;
         document.getElementById("circulating-supply").innerText = circulatingSupply;
@@ -76,7 +77,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const renderDetailFailed = (error) => {
         console.error("Error fetching coin data:", error);
-        // In case of any other errors, display "-"
         document.getElementById("market-cap").innerText = "-";
         document.getElementById("circulating-supply").innerText = "-";
         document.getElementById("date-added").innerText = "-";
