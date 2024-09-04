@@ -1,3 +1,4 @@
+import os
 from flask import Blueprint, request, jsonify
 from app.middleware.auth_middleware import token_required
 from app.services.fr_aevo import Aevo
@@ -6,6 +7,11 @@ from app.services.fr_bybit import Bybit
 from app.services.fr_gateio import Gateio
 from app.services.fr_service import FrService
 from app.services.scp import scrapper_with_pagination, get_coins
+import requests
+from dotenv import load_dotenv
+
+# Load environment variables from .env
+load_dotenv()
 
 funding_rates_bp = Blueprint('funding-rates', __name__)
 
@@ -34,6 +40,51 @@ def get_available_coins(current_user):
         return jsonify(coins)
     except Exception as e:
         return jsonify({'code': 500, 'message': str(e)}), 500
+
+# detail coin by coinmarketcap
+@funding_rates_bp.route('/coin-details-cmc', methods=['GET'])
+@token_required
+def get_detail_coin(current_user):
+    # Fetch API Key from environment variables
+    COINMARKETCAP_API_KEY = os.getenv('COINMARKETCAP_API_KEY')
+
+    if not COINMARKETCAP_API_KEY:
+        return jsonify({"error": "CoinMarketCap API key is missing"}), 500
+
+    # Prepare headers
+    headers = {
+        'Accepts': 'application/json',
+        'X-CMC_PRO_API_KEY': COINMARKETCAP_API_KEY,
+    }
+
+    # Get the coin symbol from the request query parameters
+    coin = request.args.get('coin', None)
+
+    if not coin:
+        return jsonify({"error": "Please provide a coin symbol"}), 400
+
+    url = f"https://pro-api.coinmarketcap.com/v1/cryptocurrency/info?symbol={coin.upper()}"
+
+    try:
+        # Make the request to CoinMarketCap API
+        response = requests.get(url, headers=headers)
+
+        # Check for successful response
+        if response.status_code == 200:
+            data = response.json()
+
+            # Ensure response has the correct structure
+            if 'data' in data and coin.upper() in data['data']:
+                return jsonify(data), 200
+            else:
+                return jsonify({"error": "Invalid response structure from CoinMarketCap"}), 502
+        elif response.status_code == 401:
+            return jsonify({"error": "Invalid API Key"}), 401
+        else:
+            return jsonify({"error": "Unable to fetch data from CoinMarketCap"}), response.status_code
+
+    except requests.exceptions.RequestException as e:
+        return jsonify({"error": f"Request failed: {str(e)}"}), 500
 
 # OLD
 @funding_rates_bp.route('/tickers', methods=['GET'])
