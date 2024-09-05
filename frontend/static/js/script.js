@@ -27,6 +27,8 @@ const limitPerPage = 20;
 let isFetching = false;
 let allCoinData = []; // Store all fetched data
 let isNextPageAvailable = true; // Flag to check if there are more pages to fetch
+let abortController = null;
+let requestId = 0;
 
 const showErrorNotification = (message) => {
     const notification = document.getElementById('notification');
@@ -170,21 +172,41 @@ const setupEventListeners = () => {
 };
 
 const fetchAndRenderCoinData = async () => {
+    // Abort the previous API call if it's still in progress
+    if (abortController) {
+        abortController.abort();
+    }
+
+    // Create a new AbortController instance for the new request
+    abortController = new AbortController();
+
     if (isFetching || !isNextPageAvailable) return;
-    isFetching = true;
-    loadingSpinner.style.display = 'block'; // Show the loading spinner
+
+    // Increment the request ID to track the current request
+    const currentRequestId = ++requestId;
+
+    // Show the loading spinner
+    loadingSpinner.style.display = 'block';
     loadingContainer.style.visibility = 'visible';
+    isFetching = true;
 
     try {
         // Fetch ticker data for the current page
-        const tickerData = await fetchCoin(currentPage, limitPerPage, currentTimeFilter, searchQuery);
+        const tickerData = await fetchCoin(currentPage, limitPerPage, currentTimeFilter, searchQuery, abortController.signal);
+
+        // If the current request is no longer the latest one, do nothing
+        if (currentRequestId !== requestId) return;
+
+        if (tickerData.error) {
+            throw new Error(tickerData.error); // Handle errors
+        }
 
         // Check if there are more pages to fetch
         if (!tickerData.meta || !tickerData.meta.isNextPage) {
             isNextPageAvailable = false;
         }
 
-        // Process fetched data
+        // Process the fetched data
         const coinData = tickerData.data.map((coin) => ({
             coin: {
                 coin: coin.coin,
@@ -194,18 +216,24 @@ const fetchAndRenderCoinData = async () => {
             funding: coin.funding
         }));
 
-        // Append the new coin data to the existing allCoinData array
+        // Append the new coin data to the existing array
         allCoinData = allCoinData.concat(coinData);
 
-        // Render the full data (existing + new) to the table
+        // Render the full data to the table
         renderTable(allCoinData);
 
         // Increment the page number for the next fetch
         currentPage++;
     } catch (error) {
-        console.error("Error fetching data:", error);
-        showErrorNotification("Error fetching data. Please try again.");
+        // Only show an error notification if it's not an AbortError
+        if (error.name !== 'AbortError') {
+            showErrorNotification("Error fetching data. Please try again.");
+        }
     } finally {
+        // If the current request is no longer the latest one, do nothing
+        if (currentRequestId !== requestId) return;
+
+        // Hide the spinner and reset isFetching if this is the latest request
         isFetching = false;
         loadingSpinner.style.display = 'none';
         loadingContainer.style.visibility = 'hidden';
@@ -268,6 +296,7 @@ const observer = new IntersectionObserver(async (entries) => {
 
 const refreshData = () => {
     isNextPageAvailable = true;
+    isFetching = false;
     currentPage = 1;
     allCoinData = []; // Clear existing data
     tableBody.innerHTML = '';

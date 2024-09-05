@@ -71,7 +71,7 @@ const fetchDetailCoin = async (coin) => {
     }
 };
 
-const fetchCoin = async (page, limit, time, keyword) => {
+const fetchCoin = async (page, limit, time, keyword, abortSignal) => {
     const token = getCookie('token'); // Ambil token dari cookie
 
     try {
@@ -81,16 +81,23 @@ const fetchCoin = async (page, limit, time, keyword) => {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}` // Menambahkan token pada header
             },
+            signal: abortSignal // Pass the abort signal
         });
 
         if (!response.ok) {
             return response.json();
         }
-        
+
         const data = await response.json();
         return data;
     } catch (error) {
-        return error;
+        // Only throw the error if it's not an abort error
+        if (error.name === 'AbortError') {
+            throw error; // Re-throw the abort error to be handled elsewhere
+        }
+
+        // Return a general error object for non-abort cases
+        return { error: "Request failed", details: error };
     }
 };
 
