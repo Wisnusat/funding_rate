@@ -24,7 +24,6 @@ class Gateio:
             None
         """
         gateio_assets = Gateio.fetch_gateio_instrument_names()
-        gateio_assets = gateio_assets[:5]
         logger.info(f"[GATE]Running scraper for {interval} interval with assets: {len(gateio_assets)}")
         
         start_time = time.time()

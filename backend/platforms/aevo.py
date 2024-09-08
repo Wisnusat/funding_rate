@@ -23,7 +23,6 @@ class Aevo:
             None
         """
         aevo_assets = Aevo.fetch_aevo_instrument_names()
-        aevo_assets = aevo_assets[:5]
         logger.info(f"[AEVO]Running scraper for {interval} interval with assets: {len(aevo_assets)}")
 
         # Start timing

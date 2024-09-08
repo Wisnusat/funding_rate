@@ -23,7 +23,6 @@ class Bybit:
             None
         """
         bybit_assets = Bybit.fetch_bybit_instrument_names()
-        bybit_assets = bybit_assets[:5]
         logger.info(f"[BYBIT] Running scraper for {interval} interval with assets: {len(bybit_assets)}")
 
         start_time = time.time()

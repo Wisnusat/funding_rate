@@ -23,7 +23,6 @@ class Hyperliquid:
             None
         """
         hyperliquid_assets = Hyperliquid.fetch_hyperliquid_instrument_name()
-        hyperliquid_assets = hyperliquid_assets[:5]
         logger.info(f"[HYPER]Running scraper for {interval} interval with assets: {len(hyperliquid_assets)}")
 
         # Start timing
