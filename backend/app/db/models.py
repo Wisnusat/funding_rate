@@ -46,19 +46,19 @@ class BaseModel(Base):
 
 # AevoDB model
 class AevoDB(BaseModel):
-    __tablename__ = 'funding_data_aevo'
+    __tablename__ = 'funding_data_aevo_test'
 
 
 # BybitDB model
 class BybitDB(BaseModel):
-    __tablename__ = 'funding_data_bybit'
+    __tablename__ = 'funding_data_bybit_test'
 
 
 # GateioDB model
 class GateioDB(BaseModel):
-    __tablename__ = 'funding_data_gateio'
+    __tablename__ = 'funding_data_gateio_test'
 
 
 # HyperliquidDB model
 class HyperliquidDB(BaseModel):
-    __tablename__ = 'funding_data_hyperliquid'
+    __tablename__ = 'funding_data_hyperliquid_test'

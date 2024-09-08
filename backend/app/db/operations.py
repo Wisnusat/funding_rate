@@ -3,6 +3,7 @@ import json
 from sqlalchemy import create_engine, func, cast, Numeric, desc, asc
 from sqlalchemy.orm import sessionmaker
 from app.utils import get_timeframe
+from app.logger import logger
 from app.db.models import Base, AevoDB, BybitDB, GateioDB, HyperliquidDB
 from app.config import Config
 
@@ -27,20 +28,20 @@ def save_to_database(data, model_class):
                 )
                 session.add(funding_record)
             session.commit()
-            print("Data saved successfully")
+            return True
         except Exception as e:
             session.rollback()
-            print(f"An error occurred: {e}")
+            return e
 
 def delete_all_data(model_class):
     with Session() as session:
         try:
             session.query(model_class).delete()
             session.commit()
-            print("All data deleted successfully")
+            logger.info("All data deleted successfully")
         except Exception as e:
             session.rollback()
-            print(f"An error occurred: {e}")
+            logger.error(f"An error occurred: {e}")
 
 def delete_old_data(model_class):
     with Session() as session:
@@ -51,10 +52,10 @@ def delete_old_data(model_class):
             # Menghapus data yang memiliki timestamp lebih dari 1 tahun
             session.query(model_class).filter(model_class.timestamp < one_year_ago).delete()
             session.commit()
-            print("Old data deleted successfully")
+            logger.info("Old data deleted successfully")
         except Exception as e:
             session.rollback()
-            print(f"An error occurred while deleting old data: {e}")
+            logger.error(f"An error occurred while deleting old data: {e}")
 
 def count_rows(model_class):
     with Session() as session:
