@@ -41,7 +41,6 @@ numpy==2.0.1
 packaging==24.1
 pandas==2.2.2
 platformdirs==4.2.2
-psycopg2==2.9.9
 psycopg2-binary==2.9.9
 pycares==4.4.0
 pycparser==2.22
