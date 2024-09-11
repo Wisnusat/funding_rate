@@ -7,7 +7,8 @@ from app.utils import get_timestamp_for_interval
 from app.logger import logger
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from app.db.operations import save_to_database, delete_all_data, count_rows
-
+import gc
+from app.config import Config
 class Aevo:
     @staticmethod
     def run(interval='1h'):
@@ -23,29 +24,34 @@ class Aevo:
             None
         """
         aevo_assets = Aevo.fetch_aevo_instrument_names()
-        logger.info(f"[AEVO]Running scraper for {interval} interval with assets: {len(aevo_assets)}")
+        logger.info(f"[AEVO] Running scraper for {interval} interval with assets: {len(aevo_assets)}")
 
         # Start timing
         start_time = time.time()
 
-        # Scrape data from AEVO
-        aevo_data = Aevo.runWithThreading(Aevo.fetch_aevo_data, interval, aevo_assets)
+        # Process assets in smaller batches to avoid memory overload
+        batch_size = Config.BATCH_SIZE
+        for i in range(0, len(aevo_assets), batch_size):
+            batch_assets = aevo_assets[i:i + batch_size]
+            aevo_data = Aevo.run_with_threading(Aevo.fetch_aevo_data, interval, batch_assets)
 
-        # Process data to match the expected format
-        processed_aevo_data = Aevo.process_aevo_data(aevo_data)
+            # Process data to match the expected format
+            processed_aevo_data = Aevo.process_aevo_data(aevo_data)
+
+            # Save processed data to the database
+            save_status = save_to_database(processed_aevo_data, AevoDB)
+            if save_status == True:
+                logger.info(f"[AEVO] Data batch saved successfully.")
+            else:
+                logger.error(f"[AEVO] {save_status}")
+
+            # Free memory after processing each batch
+            gc.collect()
 
         # End timing
         end_time = time.time()
         duration = end_time - start_time
-
-        # Display duration
-        logger.info(f"[AEVO]Data scraping completed in {duration:.2f} seconds.")
-
-        save_status = save_to_database(processed_aevo_data, AevoDB)
-        if save_status == True:
-            logger.info(f"[AEVO]Data saved to the database successfully.")
-        else:
-            logger.error(f"[AEVO]{save_status}")
+        logger.info(f"[AEVO] Data scraping completed in {duration:.2f} seconds.")
 
     def process_aevo_data(data):
         """
@@ -86,13 +92,13 @@ class Aevo:
         """
         Count the number of rows in the AEVO database.
 
-        This method counts and logger.infos the number of rows in the AevoDB table.
+        This method counts and logs the number of rows in the AevoDB table.
 
         Returns:
             None
         """
         count = count_rows(AevoDB)
-        logger.info(f"[AEVO]Number of rows in the database: {count}")
+        logger.info(f"[AEVO] Number of rows in the database: {count}")
 
     def fetch_aevo_instrument_names():
         """
@@ -121,7 +127,6 @@ class Aevo:
             logger.info(f"[AEVO]An error occurred while fetching instrument names: {e}")
             return []
 
-    
     def fetch_aevo_data(instrument_name, start_time, end_time, limit=50):
         """
         Fetch funding rate history data from AEVO for a given instrument with rotating User-Agent in every loop.
@@ -140,23 +145,16 @@ class Aevo:
             list: A list of funding history data fetched from the AEVO API.
         """
         url = 'https://api.aevo.xyz/funding-history'
-        
-        # Create a session object to persist cookies and headers across requests
-        session = requests.Session()
-        
-        # Initialize the fake UserAgent object for rotating User-Agents
-        ua = UserAgent()
-        
+        session = requests.Session()  # Reuse session for all requests
+        ua = UserAgent()  # Rotate User-Agent
         all_data = []
         current_end_time = end_time
 
         while current_end_time > start_time:
-            # Rotate the User-Agent for every request
             headers = {
                 'accept': 'application/json',
-                'User-Agent': ua.random  # New User-Agent in each loop iteration
+                'User-Agent': ua.random  # Rotate User-Agent in each request
             }
-
             params = {
                 'instrument_name': f"{instrument_name.upper()}-PERP",
                 'start_time': str(int(start_time)),
@@ -165,57 +163,44 @@ class Aevo:
             }
 
             retries = 0
-            max_retries = 5  # Increased retry attempts for 429/503 errors
+            max_retries = 5  # Retry attempts for 429/503 errors
             backoff_factor = 1.5  # Exponential backoff factor
 
             while retries < max_retries:
                 try:
-                    # Send a request using the session to maintain cookies and rotating User-Agent
                     response = session.get(url, params=params, headers=headers)
-                    response.raise_for_status()  # Raise HTTPError for bad responses
+                    response.raise_for_status()
                     data = response.json()
 
-                    # Handle rate limiting (429)
-                    if response.status_code == 429:
+                    if response.status_code == 429:  # Handle rate limiting (429)
                         retry_after = response.headers.get('Retry-After')
                         wait_time = int(retry_after) if retry_after else backoff_factor ** retries
-                        # logger.error(f"Rate limit hit, retrying after {wait_time} seconds with new User-Agent...")
                         time.sleep(wait_time)
                         retries += 1
-                        continue  # Retry the same request
+                        continue
 
-                    # Handle server issues (503)
-                    elif response.status_code == 503:
-                        # logger.error(f"Service unavailable for {instrument_name}. Retrying...")
+                    elif response.status_code == 503:  # Handle server issues (503)
                         retries += 1
                         wait_time = backoff_factor ** retries
                         time.sleep(wait_time)
                         continue
 
-                    # Successful data fetch
                     all_data.extend(data['funding_history'])
-                    
-                    # Stop if the number of entries is less than the limit (no more data)
+
                     if len(data['funding_history']) < limit:
                         return all_data
 
-                    # Update the current_end_time to the timestamp of the earliest data point retrieved
                     current_end_time = min(int(item[1]) for item in data['funding_history'])
-                    break  # Exit retry loop for successful request
+                    break  # Exit retry loop
 
                 except requests.RequestException as e:
-                    # Log the error (optionally)
-                    # logger.error(f"Error fetching data for {instrument_name}: {e}")
-                    
-                    # Retry with exponential backoff for other connection issues
                     retries += 1
                     wait_time = backoff_factor ** retries
                     time.sleep(wait_time)
 
         return all_data
 
-
-    def runWithThreading(fetch_data_function, interval, instrument_names):
+    def run_with_threading(fetch_data_function, interval, instrument_names):
         """
         Run data fetching for multiple instruments concurrently using threading.
 
@@ -232,7 +217,8 @@ class Aevo:
         start_time, end_time = get_timestamp_for_interval(interval)
 
         results = []
-        with ThreadPoolExecutor(max_workers=5) as executor:
+        max_workers = min(10, len(instrument_names))  # Dynamically adjust the number of workers
+        with ThreadPoolExecutor(max_workers=max_workers) as executor:
             futures = [
                 executor.submit(fetch_data_function, instrument_name, start_time, end_time)
                 for instrument_name in instrument_names

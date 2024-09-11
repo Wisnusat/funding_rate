@@ -8,7 +8,7 @@ from app.utils import get_timeframe, time_converter
 from app.logger import logger
 from app.db.models import GateioDB
 from app.db.operations import save_to_database, delete_all_data, count_rows
-
+from app.config import Config
 class Gateio:
     @staticmethod
     def run(interval='1h'):
@@ -29,7 +29,7 @@ class Gateio:
         start_time = time.time()
 
         # Process data in smaller batches to avoid running out of memory
-        batch_size = 50  # Process 50 assets at a time
+        batch_size = Config.BATCH_SIZE  # Process 50 assets at a time
         for i in range(0, len(gateio_assets), batch_size):
             batch_assets = gateio_assets[i:i + batch_size]
             gateio_data = Gateio.run_with_threading(Gateio.fetch_gateio_data, interval, batch_assets)

@@ -12,6 +12,7 @@ class Config:
     
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SECRET_KEY = os.getenv('SECRET_KEY', 'supersecretkey')
+    BATCH_SIZE = int(os.getenv('BATCH_SIZE', 50))
 
 config = Config()
 

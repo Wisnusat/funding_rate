@@ -7,14 +7,13 @@ from app.utils import time_converter
 from app.logger import logger
 from app.db.models import BybitDB
 from app.db.operations import save_to_database
-
+import gc
+from app.config import Config
 class Bybit:
     @staticmethod
     def run(interval='1h'):
         """
-        Run the Bybit scraper process for the given interval.
-
-        This method orchestrates the scraping of Bybit data, processing it, and saving it to the database.
+        Run the Bybit scraper process for the given interval with memory optimization.
 
         Args:
             interval (str): The interval at which the scraper will run. Defaults to '1h'.
@@ -27,18 +26,26 @@ class Bybit:
 
         start_time = time.time()
 
-        bybit_data = Bybit.runWithThreading(Bybit.fetch_bybit_data, interval, bybit_assets)
-        processed_data = Bybit.process_bybit_data(bybit_data)
+        # Process assets in smaller batches
+        batch_size = Config.BATCH_SIZE  # Define the batch size
+        for i in range(0, len(bybit_assets), batch_size):
+            batch_assets = bybit_assets[i:i + batch_size]
+            bybit_data = Bybit.run_with_threading(Bybit.fetch_bybit_data, interval, batch_assets)
+            processed_data = Bybit.process_bybit_data(bybit_data)
+
+            # Save processed data to the database
+            save_status = save_to_database(processed_data, BybitDB)
+            if save_status == True:
+                logger.info(f"[BYBIT] Data batch saved successfully.")
+            else:
+                logger.error(f"[BYBIT] {save_status}")
+
+            # Free memory after processing each batch
+            gc.collect()
 
         end_time = time.time()
         duration = end_time - start_time
         logger.info(f"[BYBIT] Data scraping completed in {duration:.2f} seconds.")
-
-        save_status = save_to_database(processed_data, BybitDB)
-        if save_status == True:
-            logger.info(f"[BYBIT]Data saved to the database successfully.")
-        else:
-            logger.error(f"[BYBIT]{save_status}")
 
     @staticmethod
     def process_bybit_data(data):
@@ -68,8 +75,6 @@ class Bybit:
         """
         Fetch the list of instrument names from Bybit.
 
-        This method retrieves all market pairs containing 'USDT' from Bybit's API.
-
         Returns:
             list: A list of instrument names that contain 'USDT'.
         """
@@ -80,8 +85,7 @@ class Bybit:
         with open("data_const/avail_bybit.json", 'r', encoding='utf-8') as f:
             instrument_names = json.load(f)
         return instrument_names
-        
-    
+
     @staticmethod
     def fetch_bybit_data(symbol, since):
         """
@@ -110,13 +114,13 @@ class Bybit:
                 if since >= int(datetime.now(timezone.utc).timestamp() * 1000):
                     break
             except Exception as e:
-                # logger.error(f"Error fetching data for {symbol}: {e}")
+                logger.error(f"[BYBIT] Error fetching data for {symbol}: {e}")
                 break
 
         return all_data
 
     @staticmethod
-    def runWithThreading(fetch_data_function, since, instrument_names):
+    def run_with_threading(fetch_data_function, since, instrument_names):
         """
         Run data fetching for multiple instruments concurrently using threading.
 
@@ -129,7 +133,8 @@ class Bybit:
             list: Combined results from all threads.
         """
         results = []
-        with ThreadPoolExecutor(max_workers=5) as executor:
+        max_workers = min(10, len(instrument_names))  # Dynamically adjust the number of workers based on the batch size
+        with ThreadPoolExecutor(max_workers=max_workers) as executor:
             futures = [
                 executor.submit(fetch_data_function, instrument_name, since)
                 for instrument_name in instrument_names

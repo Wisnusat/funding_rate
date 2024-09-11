@@ -9,6 +9,7 @@ from platforms.hyperliquid import Hyperliquid
 from platforms.gateio import Gateio
 from dotenv import load_dotenv
 from app.logger import logger
+from app.config import Config
 
 # KOYEB PURPOSE
 from http.server import SimpleHTTPRequestHandler, HTTPServer
@@ -38,6 +39,8 @@ interval_mapping = {
     '4': '1M',
     '5': '1y'
 }
+
+logger.info(f'BATCH_SIZE = {Config.BATCH_SIZE}')
 
 def run_scrapers_sequential(interval):
     """Run the scrapers sequentially."""
