@@ -125,7 +125,8 @@ def get_latest_funding_data(session, model_class, keyword=None):
     # Main query to get the full data for the latest funding rates
     query = session.query(
         model_class.instrument_name,
-        model_class.funding_rate,
+        # Explicitly cast funding_rate to Numeric before multiplying by 100
+        (cast(model_class.funding_rate, Numeric) * 100).label('funding_rate'),
     ).join(
         latest_funding_subquery,
         (model_class.instrument_name == latest_funding_subquery.c.instrument_name) &
@@ -136,7 +137,7 @@ def get_latest_funding_data(session, model_class, keyword=None):
     if keyword:
         query = query.filter(model_class.instrument_name.ilike(f"%{keyword}%"))
 
-    # Order by instrument_name in ascending order (or modify to 'desc' for descending)
+    # Order by instrument_name in ascending order
     query = query.order_by(model_class.instrument_name.asc())
 
     # Return the result
@@ -152,8 +153,9 @@ def get_accumulated_funding_pagination(model_class, page, limit, since, until, s
         query = query.order_by(order(model_class.instrument_name))
         
         # Apply pagination
-        result = query.offset((page - 1) * limit).limit(limit).all()
-        
+        # result = query.offset((page - 1) * limit).limit(limit).all()
+        result = query.all()
+
         # If no results are found, get the latest data without pagination
         if not result:
             # Fetch the latest data using the previously fixed function
