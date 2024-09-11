@@ -29,20 +29,23 @@ class Gateio:
         start_time = time.time()
 
         # Process data in smaller batches to avoid running out of memory
-        for asset in gateio_assets:
-            gateio_data = Gateio.runWithThreading(Gateio.fetch_gateio_data, interval, [asset])
+        batch_size = 50  # Process 50 assets at a time
+        for i in range(0, len(gateio_assets), batch_size):
+            batch_assets = gateio_assets[i:i + batch_size]
+            gateio_data = Gateio.run_with_threading(Gateio.fetch_gateio_data, interval, batch_assets)
             processed_data = Gateio.process_gateio_data(gateio_data)
             
             # Save the batch to the database
             save_status = save_to_database(processed_data, GateioDB)
             if save_status == True:
-                # logger.info(f"[GATE]Data saved to the database successfully.")
+                # Data saved successfully
                 pass
             else:
                 logger.error(f"[GATE]{save_status}")
             
-            # Run garbage collection to free up memory
+            # Run garbage collection to free up memory after each batch
             gc.collect()
+        
         logger.info(f"[GATE]Data saved to the database successfully.")
 
         end_time = time.time()
@@ -84,7 +87,7 @@ class Gateio:
         # exchange.load_markets()
         # # Return list of symbols that contain 'USDT'
         # return [pair for pair in exchange.markets if 'USDT' in pair]
-
+        
         with open("data_const/avail_gate.json", 'r', encoding='utf-8') as f:
             instrument_names = json.load(f)
         return instrument_names
@@ -108,15 +111,14 @@ class Gateio:
         try:
             data = exchange.fetch_funding_rate_history(f'{symbol}/USDT:USDT', since, limit=limit)
         except Exception as e:
-            # logger.error(f"[GATE][{symbol}]: {e}")
-            f"Error fetching funding rate history: {e}"
+            logger.error(f"[GATE][{symbol}]: {e}")
         return data
 
     @staticmethod
-    def runWithThreading(fetch_data_function, since, instrument_names):
+    def run_with_threading(fetch_data_function, since, instrument_names):
         """
         Run data fetching for multiple instruments concurrently with reduced memory usage.
-        Reduces the number of concurrent threads to optimize memory usage.
+        Optimized for batch processing and reduced memory usage by limiting the number of threads.
 
         Args:
             fetch_data_function (function): The function to fetch data.
@@ -127,7 +129,8 @@ class Gateio:
             list: Combined results from all threads.
         """
         results = []
-        with ThreadPoolExecutor(max_workers=2) as executor:  # Keep thread pool size small to reduce memory usage
+        max_workers = min(10, len(instrument_names))  # Dynamically adjust the number of workers
+        with ThreadPoolExecutor(max_workers=max_workers) as executor:
             futures = [
                 executor.submit(fetch_data_function, instrument_name, since)
                 for instrument_name in instrument_names
