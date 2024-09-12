@@ -40,7 +40,7 @@ class Gateio:
             save_status = save_to_database(processed_data, GateioDB)
             batch_iteration += 1
             if save_status == True:
-                logger.info(f"[BYBIT][{batch_iteration}] Data batch saved successfully.")
+                logger.info(f"[GATE][{batch_iteration}] Data batch saved successfully.")
             else:
                 logger.error(f"[GATE][{batch_iteration}] {save_status}")
             
