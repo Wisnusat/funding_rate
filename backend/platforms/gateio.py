@@ -30,6 +30,7 @@ class Gateio:
 
         # Process data in smaller batches to avoid running out of memory
         batch_size = Config.BATCH_SIZE  # Process 50 assets at a time
+        batch_iteration = 0
         for i in range(0, len(gateio_assets), batch_size):
             batch_assets = gateio_assets[i:i + batch_size]
             gateio_data = Gateio.run_with_threading(Gateio.fetch_gateio_data, interval, batch_assets)
@@ -37,11 +38,11 @@ class Gateio:
             
             # Save the batch to the database
             save_status = save_to_database(processed_data, GateioDB)
+            batch_iteration += 1
             if save_status == True:
-                # Data saved successfully
-                pass
+                logger.info(f"[BYBIT][{batch_iteration}] Data batch saved successfully.")
             else:
-                logger.error(f"[GATE]{save_status}")
+                logger.error(f"[GATE][{batch_iteration}] {save_status}")
             
             # Run garbage collection to free up memory after each batch
             gc.collect()

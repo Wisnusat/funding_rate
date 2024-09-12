@@ -28,6 +28,7 @@ class Bybit:
 
         # Process assets in smaller batches
         batch_size = Config.BATCH_SIZE  # Define the batch size
+        batch_iteration = 0
         for i in range(0, len(bybit_assets), batch_size):
             batch_assets = bybit_assets[i:i + batch_size]
             bybit_data = Bybit.run_with_threading(Bybit.fetch_bybit_data, interval, batch_assets)
@@ -35,10 +36,11 @@ class Bybit:
 
             # Save processed data to the database
             save_status = save_to_database(processed_data, BybitDB)
+            batch_iteration += 1
             if save_status == True:
-                logger.info(f"[BYBIT] Data batch saved successfully.")
+                logger.info(f"[BYBIT][{batch_iteration}] Data batch saved successfully.")
             else:
-                logger.error(f"[BYBIT] {save_status}")
+                logger.error(f"[BYBIT][{batch_iteration}] {save_status}")
 
             # Free memory after processing each batch
             gc.collect()

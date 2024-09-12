@@ -31,6 +31,7 @@ class Aevo:
 
         # Process assets in smaller batches to avoid memory overload
         batch_size = Config.BATCH_SIZE
+        batch_iteration = 0
         for i in range(0, len(aevo_assets), batch_size):
             batch_assets = aevo_assets[i:i + batch_size]
             aevo_data = Aevo.run_with_threading(Aevo.fetch_aevo_data, interval, batch_assets)
@@ -40,10 +41,11 @@ class Aevo:
 
             # Save processed data to the database
             save_status = save_to_database(processed_aevo_data, AevoDB)
+            batch_iteration += 1
             if save_status == True:
-                logger.info(f"[AEVO] Data batch saved successfully.")
+                logger.info(f"[AEVO][{batch_iteration}] Data batch saved successfully.")
             else:
-                logger.error(f"[AEVO] {save_status}")
+                logger.error(f"[AEVO][{batch_iteration}] {save_status}")
 
             # Free memory after processing each batch
             gc.collect()

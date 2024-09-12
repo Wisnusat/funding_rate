@@ -31,6 +31,7 @@ class Hyperliquid:
 
         # Process assets in smaller batches to avoid memory overload
         batch_size = Config.BATCH_SIZE
+        batch_iteration = 0
         for i in range(0, len(hyperliquid_assets), batch_size):
             batch_assets = hyperliquid_assets[i:i + batch_size]
             hyperliquid_data = Hyperliquid.run_with_threading(Hyperliquid.fetch_hyperliquid_data, interval, batch_assets)
@@ -40,10 +41,11 @@ class Hyperliquid:
 
             # Save processed data to the database
             save_status = save_to_database(processed_data, HyperliquidDB)
+            batch_iteration += 1
             if save_status == True:
-                logger.info(f"[HYPER] Data batch saved successfully.")
+                logger.info(f"[HYPER][{batch_iteration}] Data batch saved successfully.")
             else:
-                logger.error(f"[HYPER] {save_status}")
+                logger.error(f"[HYPER][{batch_iteration}] {save_status}")
 
             # Free memory after processing each batch
             gc.collect()
