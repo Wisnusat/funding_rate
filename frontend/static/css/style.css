@@ -287,6 +287,16 @@ table td {
     z-index: 4;
 }
 
+table th.coin-column,
+table td.coin-column {
+    width: 100px; /* Adjust this value to make the column smaller or larger */
+    max-width: 100px; /* Ensure the column does not exceed this width */
+    min-width: 100px; /* Ensure the column does not shrink below this width */
+    overflow: hidden; /* Hide overflow content */
+    text-overflow: ellipsis; /* Add ellipsis for overflow text */
+    white-space: nowrap; /* Prevent text from wrapping */
+}
+
 .sticky-col {
     position: -webkit-sticky; /* For Safari */
     position: sticky;

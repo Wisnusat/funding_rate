@@ -20,7 +20,7 @@ const dropdownLoading = document.getElementById('dropdownLoading');
 const calculateLoading = document.getElementById('calculateLoading');
 const calculateButton = document.querySelector('.calculate-button');
 
-let currentTimeFilter = '1y'; // Default time filter
+let currentTimeFilter = '1h'; // Default time filter
 let searchQuery = ''; // Default search query
 let currentPage = 1;
 const limitPerPage = 20;
@@ -257,6 +257,38 @@ const observerOptions = {
     threshold: 1.0
 };
 
+// Function to handle smooth and slower scrolling
+const smoothScrollHandler = (event) => {
+    event.preventDefault(); // Prevent the default scroll behavior
+
+    // Adjust the scroll sensitivity factor
+    const scrollSensitivity = 0.5; // Decrease this value to make scrolling slower
+
+    // Calculate the new scroll position
+    const scrollAmount = event.deltaY * scrollSensitivity;
+
+    // Use requestAnimationFrame for smooth scrolling
+    const scrollElement = document.querySelector('.table-container');
+    let start = null;
+
+    const step = (timestamp) => {
+        if (!start) start = timestamp;
+        const progress = timestamp - start;
+        const scrollStep = Math.min(progress / 10, scrollAmount); // Adjust the divisor for smoothness
+
+        scrollElement.scrollTop += scrollStep;
+
+        if (progress < 200) { // Adjust the duration for smoothness
+            requestAnimationFrame(step);
+        }
+    };
+
+    requestAnimationFrame(step);
+};
+
+// Add the smooth scroll handler to the table container
+document.querySelector('.table-container').addEventListener('wheel', smoothScrollHandler);
+
 const lazyLoadImages = () => {
     const images = document.querySelectorAll('img.lazy');
     const imageObserver = new IntersectionObserver((entries, observer) => {
@@ -321,11 +353,11 @@ const compareValues = (key, order = 'asc') => {
         let aValue, bValue;
 
         if (key === 'average' || key !== 'coin') {
-            aValue = a.funding[key] === null ? Number.NEGATIVE_INFINITY : parseFloat(a.funding[key]);
-            bValue = b.funding[key] === null ? Number.NEGATIVE_INFINITY : parseFloat(b.funding[key]);
+            aValue = a.funding[key] === null || a.funding[key] === '-' ? Number.NEGATIVE_INFINITY : parseFloat(a.funding[key]);
+            bValue = b.funding[key] === null || b.funding[key] === '-' ? Number.NEGATIVE_INFINITY : parseFloat(b.funding[key]);
         } else {
-            aValue = a.coin[key] === null ? Number.NEGATIVE_INFINITY : a.coin[key];
-            bValue = b.coin[key] === null ? Number.NEGATIVE_INFINITY : b.coin[key];
+            aValue = a.coin[key] === null || a.coin[key] === '-' ? Number.NEGATIVE_INFINITY : a.coin[key];
+            bValue = b.coin[key] === null || b.coin[key] === '-' ? Number.NEGATIVE_INFINITY : b.coin[key];
         }
 
         let comparison = 0;
