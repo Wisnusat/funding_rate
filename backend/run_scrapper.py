@@ -1,7 +1,6 @@
 import os
 import time
 import schedule
-import logging
 from datetime import datetime
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from platforms.aevo import Aevo
@@ -9,6 +8,8 @@ from platforms.bybit import Bybit
 from platforms.hyperliquid import Hyperliquid
 from platforms.gateio import Gateio
 from dotenv import load_dotenv
+from app.logger import logger
+from app.config import Config
 
 # KOYEB PURPOSE
 from http.server import SimpleHTTPRequestHandler, HTTPServer
@@ -19,36 +20,18 @@ def run_http_server():
     httpd = HTTPServer(('0.0.0.0', 8000), handler)
     httpd.serve_forever()
 
-# Start the HTTP server in a separate thread
 server_thread = threading.Thread(target=run_http_server)
 server_thread.daemon = True
 server_thread.start()
 # ===============================================================
 
-# Set up logging
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    handlers=[
-        logging.FileHandler("scraper.log"),
-        logging.StreamHandler()
-    ]
-)
-
-logger = logging.getLogger(__name__)
-
-# Load environment variables
 load_dotenv()
-
-# Extract environment variables
 FIRST_RUN = os.getenv('FIRST_RUN', 'n').lower()
 EXECUTION_MODE = os.getenv('EXECUTION_MODE', '2')
 INTERVAL_CHOICE = os.getenv('INTERVAL_CHOICE', '1')
 SCHEDULE_CHOICE = os.getenv('SCHEDULE_CHOICE', '1')
 SCHEDULE_INTERVAL_SECONDS = int(os.getenv('SCHEDULE_INTERVAL_SECONDS', 10))
 SCHEDULE_MINUTE = os.getenv('SCHEDULE_MINUTE', '00')
-
-# Mapping for interval choices
 interval_mapping = {
     '1': '1h',
     '2': '1d',
@@ -57,9 +40,12 @@ interval_mapping = {
     '5': '1y'
 }
 
+logger.info(f'BATCH_SIZE = {Config.BATCH_SIZE}')
+
 def run_scrapers_sequential(interval):
     """Run the scrapers sequentially."""
     scrapers = [Aevo(), Bybit(), Hyperliquid(), Gateio()]
+    logger.info("WILL SCRAPE: AEVO, BYBIT, HYPERLIQUID, GATEIO")
     for scraper in scrapers:
         try:
             logger.info(f"Running {scraper.__class__.__name__} scraper...")
@@ -71,6 +57,7 @@ def run_scrapers_sequential(interval):
 def run_scrapers_parallel(interval):
     """Run the scrapers in parallel."""
     scrapers = [Aevo(), Bybit(), Hyperliquid(), Gateio()]
+    logger.info("WILL SCRAPE: AEVO, BYBIT, HYPERLIQUID, GATEIO")
     with ThreadPoolExecutor(max_workers=len(scrapers)) as executor:
         futures = [executor.submit(scraper.run, interval) for scraper in scrapers]
         for future in as_completed(futures):
@@ -106,25 +93,23 @@ def schedule_scrapers():
     return schedule_interval
 
 def main():
-    # Determine the first run interval
     first_run_interval = '1y' if FIRST_RUN == 'y' else interval_mapping.get(INTERVAL_CHOICE, '1h')
 
-    # Run the scraper for the first time
     logger.info(f"Starting the first run with interval: {first_run_interval}")
     if EXECUTION_MODE == '1':
+        logger.info("Running with SEQUENTIAL mode")
         run_scrapers_sequential(first_run_interval)
     elif EXECUTION_MODE == '2':
+        logger.info("Running with PARALLEL mode")
         run_scrapers_parallel(first_run_interval)
-
-    # Schedule the scrapers based on the environment configuration
+    
     schedule_task = schedule_scrapers()
+    next_run_time = schedule.next_run()
+    logger.info(f"Next run scheduled at: {next_run_time}")
 
-    # Keep the script running and check for scheduled tasks
     while True:
-        next_run_time = schedule.next_run()
-        logger.info(f"Next run scheduled at: {next_run_time}")
-        countdown_to_next_run(next_run_time)
         schedule.run_pending()
+        time.sleep(1)
 
 if __name__ == "__main__":
     main()
