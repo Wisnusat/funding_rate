@@ -2,8 +2,8 @@ import { fetchCoin, fetchCoinList } from "../../config/apiService.js";
 
 const loadingContainer = document.getElementById('loadingContainer');
 const loadingSpinner = document.getElementById('loadingSpinner');
-const CHEVRON_GREEN = '/frontend/assets/icon/chevron-green.png';
-const CHEVRON_RED = '/frontend/assets/icon/chevron-red.png';
+const CHEVRON_GREEN = '/assets/icon/chevron-green.png';
+const CHEVRON_RED = '/assets/icon/chevron-red.png';
 const tableBody = document.getElementById('coinTableBody');
 const refreshButton = document.querySelector('.refresh-button');
 const searchBarMobile = document.getElementById('searchBarMobile');
@@ -51,7 +51,7 @@ const formatToFourDecimalPlaces = (numberString) => {
 const renderFundRate = (rate) => {
     if (rate !== null && rate !== undefined) {
         const icon = rate.includes('-') ? CHEVRON_RED : CHEVRON_GREEN;
-        return `<img src="/frontend/assets/icon/loading-placeholder.png" data-src="${icon}" alt="${rate.includes('-') ? 'Down' : 'Up'}" class="chevron-icon lazy"> ${formatToFourDecimalPlaces(rate)}%`;
+        return `<img src="/assets/icon/loading-placeholder.png" data-src="${icon}" alt="${rate.includes('-') ? 'Down' : 'Up'}" class="chevron-icon lazy"> ${formatToFourDecimalPlaces(rate)}%`;
     }
     return '-';
 };
