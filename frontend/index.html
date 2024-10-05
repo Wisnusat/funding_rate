@@ -5,8 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard</title>
-    <link rel="stylesheet" href="/static/css/style.css">
-    <link rel="stylesheet" href="/static/css/global.css">
+    <link rel="stylesheet" href="/frontend/static/css/style.css">
+    <link rel="stylesheet" href="/frontend/static/css/global.css">
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Montserrat:wght@400;500;600&display=swap"
         rel="stylesheet">
@@ -16,15 +16,15 @@
 <body>
     <div class="sidebar">
         <div class="logo">
-            <img src="/assets/image/logo.png" width="52px" height="52px" />
+            <img src="/frontend/assets/image/logo.png" width="52px" height="52px" />
             <div class="logo-name">Xxx</div>
         </div>
         <div class="overview">Overview</div>
         <ul class="menu">
-            <li class="menu-item active"><a href="#"><img class="icon-menu" src="/assets/icon/dashboard.png"
+            <li class="menu-item active"><a href="#"><img class="icon-menu" src="/frontend/assets/icon/dashboard.png"
                         width="24px" height="24px" />Dashboard</a></li>
             <li class="menu-item logout"><a id="logoutLink" href="/login.html"><img class="icon-menu"
-                        src="/assets/icon/logout.png" width="24px" height="24px" />Logout</a></li>
+                        src="/frontend/assets/icon/logout.png" width="24px" height="24px" />Logout</a></li>
         </ul>
     </div>
     <div class="vertical-line"></div>
@@ -48,25 +48,25 @@
                     <input type="text" id="searchBarMobile" placeholder="Search Any coin">
                 </div>
             </div>
-            <img src="/assets/icon/hamburger.png" width="28" height="28" id="hamburger-menu" />
+            <img src="/frontend/assets/icon/hamburger.png" width="28" height="28" id="hamburger-menu" />
         </div>
         <!-- Drawer -->
         <div id="drawer" class="drawer">
             <div class="drawer-content">
                 <div class="close-drawer">
-                    <img src="/assets/icon/close.png" width="28" height="28" id="close-drawer" />
+                    <img src="/frontend/assets/icon/close.png" width="28" height="28" id="close-drawer" />
                 </div>
                 <div class="logo">
-                    <img src="/assets/image/logo.png" width="52px" height="52px" />
+                    <img src="/frontend/assets/image/logo.png" width="52px" height="52px" />
                     <div class="logo-name">Xxx</div>
                 </div>
                 <div class="overview">Overview</div>
                 <ul class="menu">
                     <li class="menu-item active"><a href="#"><img class="icon-menu"
-                                src="/assets/icon/dashboard.png" width="24px" height="24px" />Dashboard</a>
+                                src="/frontend/assets/icon/dashboard.png" width="24px" height="24px" />Dashboard</a>
                     </li>
                     <li class="menu-item logout"><a id="logoutLink" href="/login.html"><img class="icon-menu"
-                                src="/assets/icon/logout.png" width="24px" height="24px" />Logout</a></li>
+                                src="/frontend/assets/icon/logout.png" width="24px" height="24px" />Logout</a></li>
                 </ul>
             </div>
         </div>
@@ -95,39 +95,39 @@
                 <table id="coinTable">
                     <thead>
                         <tr>
-                            <th class="sticky-header coin-column">
+                            <th class="sticky-header">
                                 <div class="sortable" data-sort="coin">
                                     <div class="column">
                                         Coin
-                                        <img src="/assets/icon/ascdesc.png" width="8" height="16"
+                                        <img src="/frontend/assets/icon/ascdesc.png" width="8" height="16"
                                             class="sort-icon" data-sort="coin" />
                                     </div>
                                 </div>
                             </th>
                             <th class="sortable" data-sort="average">
                                 <div class="column">
-                                    Average<img src="/assets/icon/ascdesc.png" width="8" height="16"
+                                    Average<img src="/frontend/assets/icon/ascdesc.png" width="8" height="16"
                                         class="sort-icon" data-sort="coin" />
                                 </div>
                             </th>
                             <th class="sortable" data-sort="aevo">
-                                <div class="column"><img src="/assets/icon/aevo.png" width="24"
-                                        height="24" />AEVO<img src="/assets/icon/ascdesc.png" width="8"
+                                <div class="column"><img src="/frontend/assets/icon/aevo.png" width="24"
+                                        height="24" />AEVO<img src="/frontend/assets/icon/ascdesc.png" width="8"
                                         height="16" /></div>
                             </th>
                             <th class="sortable" data-sort="bybit">
-                                <div class="column"><img src="/assets/icon/bybit.png" width="24"
-                                        height="24" />BYBIT<img src="/assets/icon/ascdesc.png" width="8"
+                                <div class="column"><img src="/frontend/assets/icon/bybit.png" width="24"
+                                        height="24" />BYBIT<img src="/frontend/assets/icon/ascdesc.png" width="8"
                                         height="16" /></div>
                             </th>
                             <th class="sortable" data-sort="gateio">
-                                <div class="column"><img src="/assets/icon/gateio.png" width="24"
-                                        height="24" />GATEio<img src="/assets/icon/ascdesc.png" width="8"
+                                <div class="column"><img src="/frontend/assets/icon/gateio.png" width="24"
+                                        height="24" />GATEio<img src="/frontend/assets/icon/ascdesc.png" width="8"
                                         height="16" /></div>
                             </th>
                             <th class="sortable" data-sort="hyperliquid">
-                                <div class="column"><img src="/assets/icon/hyperliquid.png" width="24"
-                                        height="24" />HYPERLiquid<img src="/assets/icon/ascdesc.png" width="8"
+                                <div class="column"><img src="/frontend/assets/icon/hyperliquid.png" width="24"
+                                        height="24" />HYPERLiquid<img src="/frontend/assets/icon/ascdesc.png" width="8"
                                         height="16" /></div>
                             </th>
                         </tr>
@@ -210,8 +210,8 @@
     </div>
     <div id="notification" class="notification"></div>
 
-    <script src="/static/js/script.js" type="module"></script>
-    <script src="/static/js/auth.js"></script>
+    <script src="/frontend/static/js/script.js" type="module"></script>
+    <script src="/frontend/static/js/auth.js"></script>
 </body>
 
 </html>

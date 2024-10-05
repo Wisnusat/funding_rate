@@ -2,8 +2,8 @@ import { fetchCoin, fetchCoinList } from "../../config/apiService.js";
 
 const loadingContainer = document.getElementById('loadingContainer');
 const loadingSpinner = document.getElementById('loadingSpinner');
-const CHEVRON_GREEN = '/assets/icon/chevron-green.png';
-const CHEVRON_RED = '/assets/icon/chevron-red.png';
+const CHEVRON_GREEN = '/frontend/assets/icon/chevron-green.png';
+const CHEVRON_RED = '/frontend/assets/icon/chevron-red.png';
 const tableBody = document.getElementById('coinTableBody');
 const refreshButton = document.querySelector('.refresh-button');
 const searchBarMobile = document.getElementById('searchBarMobile');
@@ -51,7 +51,7 @@ const formatToFourDecimalPlaces = (numberString) => {
 const renderFundRate = (rate) => {
     if (rate !== null && rate !== undefined) {
         const icon = rate.includes('-') ? CHEVRON_RED : CHEVRON_GREEN;
-        return `<img src="/assets/icon/loading-placeholder.png" data-src="${icon}" alt="${rate.includes('-') ? 'Down' : 'Up'}" class="chevron-icon lazy"> ${formatToFourDecimalPlaces(rate)}%`;
+        return `<img src="/frontend/assets/icon/loading-placeholder.png" data-src="${icon}" alt="${rate.includes('-') ? 'Down' : 'Up'}" class="chevron-icon lazy"> ${formatToFourDecimalPlaces(rate)}%`;
     }
     return '-';
 };
@@ -352,13 +352,21 @@ const compareValues = (key, order = 'asc') => {
     return function(a, b) {
         let aValue, bValue;
 
-        if (key === 'average' || key !== 'coin') {
-            aValue = a.funding[key] === null || a.funding[key] === '-' ? Number.NEGATIVE_INFINITY : parseFloat(a.funding[key]);
-            bValue = b.funding[key] === null || b.funding[key] === '-' ? Number.NEGATIVE_INFINITY : parseFloat(b.funding[key]);
+        if (key === 'average') {
+            aValue = calculateAverage([a.funding.aevo, a.funding.hyperliquid, a.funding.bybit, a.funding.gateio]);
+            bValue = calculateAverage([b.funding.aevo, b.funding.hyperliquid, b.funding.bybit, b.funding.gateio]);
+        } else if (key !== 'coin') {
+            aValue = a.funding[key] === null || a.funding[key] === '-' ? null : parseFloat(a.funding[key]);
+            bValue = b.funding[key] === null || b.funding[key] === '-' ? null : parseFloat(b.funding[key]);
         } else {
-            aValue = a.coin[key] === null || a.coin[key] === '-' ? Number.NEGATIVE_INFINITY : a.coin[key];
-            bValue = b.coin[key] === null || b.coin[key] === '-' ? Number.NEGATIVE_INFINITY : b.coin[key];
+            aValue = a.coin[key] === null || a.coin[key] === '-' ? null : a.coin[key];
+            bValue = b.coin[key] === null || b.coin[key] === '-' ? null : b.coin[key];
         }
+
+        // Handle null or "-" values to always be at the bottom
+        if (aValue === null && bValue === null) return 0;
+        if (aValue === null) return 1;
+        if (bValue === null) return -1;
 
         let comparison = 0;
         if (aValue > bValue) comparison = 1;
