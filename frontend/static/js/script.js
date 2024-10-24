@@ -67,7 +67,7 @@ const renderTableRow = (coin, funding) => {
     const average = calculateAverage([funding.aevo, funding.hyperliquid, funding.bybit, funding.gateio]);
     return `
         <tr onclick="window.location.href='/detail.html?name=${coin.name ? coin.name.toLowerCase() : 'none'}&coin=${coin.coin}&logo=${coin.logo}'" style="cursor:pointer;">
-            <td class="sticky-col">
+            <td class="sticky-col coin-column">
                 <img src="/assets/icon/loading-placeholder.png" data-src="${coin.logo}" class="coin-logo lazy">
                 ${coin.coin}
             </td>

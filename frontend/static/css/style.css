@@ -260,7 +260,7 @@ table {
 
 table th,
 table td {
-    padding: 15px;
+    padding: 12px;
     text-align: left;
     font-weight: 600;
     white-space: nowrap; /* Prevent text from wrapping */
@@ -633,6 +633,15 @@ table td {
     background-color: #ccc; /* Greyed out background */
     cursor: not-allowed;
     opacity: 0.7;
+}
+
+.coin-column {
+    width: 70px; /* Set a smaller width */
+    max-width: 70px; /* Ensure it does not exceed this width */
+    min-width: 70px; /* Ensure it does not shrink below this width */
+    overflow: hidden; /* Hide overflow content */
+    text-overflow: ellipsis; /* Add ellipsis for overflow text */
+    white-space: nowrap; /* Prevent text from wrapping */
 }
 
 /* Responsive Design */
