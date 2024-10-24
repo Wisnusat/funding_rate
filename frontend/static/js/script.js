@@ -547,7 +547,13 @@ document.getElementById('arbitrageForm').addEventListener('submit', async functi
     const coinId = coinSearchDropdown.dataset.selectedCoinId;
     const amount = parseFloat(document.getElementById('amount').value);
     const time = document.getElementById('timeInterval').value;
-
+    
+    const tradingFeeA = 0.001; // Trading Fee Exchange A (10%)
+    const tradingFeeB = 0.002; // Trading Fee Exchange B (20%)
+    const withdrawalFee = 5; // Fixed Withdrawal Fee in USDT
+    const borrowingFee = 0.0001; // Daily Borrowing Fee (1%)
+    const periods = 3; // Funding periods in a day (3 periods of 8 hours each)
+    
     if (!coinId) {
         showErrorNotification("Please select a coin.");
         return;
@@ -569,10 +575,19 @@ document.getElementById('arbitrageForm').addEventListener('submit', async functi
         const fundingRateA = parseFloat(selectedCoin.funding[exchangeA] || 0);
         const fundingRateB = parseFloat(selectedCoin.funding[exchangeB] || 0);
 
-        const cumulativeFundingRate = fundingRateA + fundingRateB;
-        const result = cumulativeFundingRate * amount;
+        // Step 1: Selisih Funding Rate
+        const fundingRateDiff = fundingRateA - fundingRateB;
 
-        document.getElementById('result').innerText = `Estimated Arbitrage Profit: $${result.toFixed(2)}`;
+        // Step 2: Funding Rate Profit
+        const fundingRateProfit = fundingRateDiff * amount * periods;
+
+        // Step 3: Total Transaction Costs
+        const totalTransactionCosts = (amount * tradingFeeA) + (amount * tradingFeeB) + withdrawalFee + (amount * borrowingFee * periods);
+
+        // Step 4: Profit/Loss
+        const profitOrLoss = fundingRateProfit - totalTransactionCosts;
+
+        document.getElementById('result').innerText = `Profit/Loss: $${profitOrLoss.toFixed(2)}`;
     } catch (error) {
         console.error("Error fetching funding rates:", error);
         showErrorNotification("Error fetching funding rates. Please try again.");
