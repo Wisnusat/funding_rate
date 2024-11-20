@@ -41,6 +41,12 @@ body {
     margin-bottom: 16px;
 }
 
+.top-header {
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+}
+
 .back-button {
     text-decoration: none;
     color: #333;
@@ -157,6 +163,156 @@ body {
     width: 70%;
 }
 
+/* Enhanced Toggle Switch */
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 30px;
+}
+
+.switch input {
+    display: none;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    border-radius: 30px;
+    transition: background-color 0.4s;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 5px;
+    box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+}
+
+.slider:before {
+    content: "";
+    position: absolute;
+    height: 24px;
+    width: 24px;
+    background-color: white;
+    border-radius: 50%;
+    top: 50%;
+    left: 3px;
+    transform: translateY(-50%);
+    transition: transform 0.4s;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+/* Background changes on toggle */
+input:checked + .slider {
+    background-color: #4d4d4d;
+}
+
+input:checked + .slider:before {
+    transform: translate(30px, -50%);
+}
+
+/* Icon Styles */
+.slider .icon {
+    position: absolute;
+    font-size: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    transition: opacity 0.4s;
+    pointer-events: none; /* Prevent icon blocking clicks */
+}
+
+.slider .sun {
+    /* left: 12px; */
+    opacity: 1;
+    color: #fdd835; /* Bright yellow for sun */
+}
+
+.slider .moon {
+    right: 6px;
+    opacity: 0;
+    color: #ffffff; /* White for moon */
+}
+
+input:checked + .slider .sun {
+    opacity: 0;
+}
+
+input:checked + .slider .moon {
+    opacity: 1;
+}
+
+/* Dark mode styles */
+body.dark-mode {
+    background-color: #121212;
+}
+
+.dark-mode .container {
+    color: #e0e0e0;
+}
+
+.dark-mode .back-button {
+    color: #e0e0e0;
+}
+
+.dark-mode .content {
+    background-color: #1e1e1e;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+}
+
+.dark-mode .crypto-details h1 {
+    color: #ffffff;
+}
+
+.dark-mode .badge {
+    background-color: #333333;
+    color: #e0e0e0;
+}
+
+.dark-mode .price {
+    color: #ffffff;
+}
+
+.dark-mode .details-section {
+    background-color: #252525;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+}
+
+.dark-mode .details-section h2 {
+    color: #ffffff;
+}
+
+.dark-mode .details-section ul li {
+    color: #e0e0e0;
+    border-bottom: 1px solid #333333;
+}
+
+.dark-mode #description {
+    color: #b0b0b0;
+}
+
+/* Preserve the green/red colors but make them more visible in dark mode */
+.dark-mode .percentage {
+    color: #1fe495; /* Brighter green for dark mode */
+}
+
+.dark-mode .down {
+    color: #ff4d4d; /* Brighter red for dark mode */
+}
+
+/* Light mode icon color */
+.back-button i {
+    color: #333; /* Dark color for light mode */
+}
+
+/* Dark mode icon color */
+.dark-mode .back-button i {
+    color: #e0e0e0; /* Light color for dark mode */
+}
+
 @media (max-width: 768px) {
     body {
         padding: 0px;
@@ -192,5 +348,13 @@ body {
 
     #description {
         display: none;
+    }
+
+    .dark-mode .content {
+        background-color: transparent;
+    }
+    
+    .dark-mode .details-section {
+        background-color: #252525;
     }
 }

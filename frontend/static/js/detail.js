@@ -2,7 +2,35 @@ import {
     fetchDetailCoin
 } from "../../config/apiService.js";
 
+let theme = "light";
+
 document.addEventListener("DOMContentLoaded", () => {
+    const darkModeToggle = document.getElementById('darkModeToggle');
+    const body = document.body;
+
+    // Load initial mode from localStorage
+    const darkMode = localStorage.getItem('dark-mode');
+    if (darkMode === 'enabled') {
+        body.classList.add('dark-mode');
+        darkModeToggle.checked = true;
+        theme = "dark";
+    }
+
+    // Toggle dark mode
+    darkModeToggle.addEventListener('change', () => {
+        if (darkModeToggle.checked) {
+            body.classList.add('dark-mode');
+            localStorage.setItem('dark-mode', 'enabled');
+            theme = "dark";
+            renderChart(coinSymbol);
+        } else {
+            body.classList.remove('dark-mode');
+            localStorage.setItem('dark-mode', 'disabled');
+            theme = "light";
+            renderChart(coinSymbol);
+        }
+    });
+
     const chartWrapper = document.getElementById("chart-section");
 
     const getUrlParameter = (name, defaultValue = '') => {
@@ -18,7 +46,7 @@ document.addEventListener("DOMContentLoaded", () => {
             symbol: `${symbol}USDT`,
             interval: "D",
             timezone: "Etc/UTC",
-            theme: "light",
+            theme: theme,
             style: "1",
             locale: "ja",
             allow_symbol_change: true,

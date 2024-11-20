@@ -10,6 +10,7 @@ const searchBarMobile = document.getElementById('searchBarMobile');
 const searchBarDesktop = document.getElementById('searchBarDesktop');
 const timeFilters = document.querySelectorAll('.time-filter');
 const hamburgerMenu = document.getElementById('hamburger-menu');
+const hamburgerMenuLight = document.getElementById('hamburger-menu-light');
 const drawer = document.getElementById('drawer');
 const overlay = document.getElementById('overlay');
 const closeDrawerButton = document.getElementById('close-drawer');
@@ -135,6 +136,7 @@ const setupEventListeners = () => {
     }));
 
     hamburgerMenu.addEventListener('click', openDrawer);
+    hamburgerMenuLight.addEventListener('click', openDrawer);
     closeDrawerButton.addEventListener('click', closeDrawerAndOverlay);
     overlay.addEventListener('click', closeDrawerAndOverlay);
     logoutLink.addEventListener('click', logout);
@@ -372,7 +374,13 @@ const compareValues = (key, order = 'asc') => {
         if (aValue > bValue) comparison = 1;
         else if (aValue < bValue) comparison = -1;
 
-        return (order === 'desc') ? (comparison * -1) : comparison;
+        if (order === 'asc') {
+            return comparison;
+        } else if (order === 'desc') {
+            return comparison * -1;
+        } else {
+            return 0;
+        }
     };
 };
 
@@ -388,13 +396,21 @@ const setupSortEventListeners = () => {
     sortableHeaders.forEach(header => {
         header.addEventListener('click', () => {
             const column = header.dataset.sort;
+            
             if (sortState.column === column) {
-                sortState.order = sortState.order === 'asc' ? 'desc' : 'asc';
+                if (sortState.order === 'asc') {
+                    sortState.order = 'desc';  // Switch to descending order
+                } else if (sortState.order === 'desc') {
+                    sortState.order = 'initial';  // Reset to initial state
+                } else {
+                    sortState.order = 'asc';  // Switch back to ascending order
+                }
             } else {
                 sortState.column = column;
                 sortState.order = 'asc';
             }
-            sortAndRenderData(); // Sort and render data with the new sort state
+
+            sortAndRenderData();
         });
     });
 };
@@ -418,6 +434,44 @@ updateLocalTime();
 setInterval(updateLocalTime, 1000);
 
 document.addEventListener("DOMContentLoaded", () => {
+    const darkModeToggle = document.getElementById('darkModeToggle');
+    const darkModeToggleMobile = document.getElementById('darkModeToggleMobile');
+    const body = document.body;
+
+    // Load initial mode from localStorage
+    const darkMode = localStorage.getItem('dark-mode');
+    if (darkMode === 'enabled') {
+        body.classList.add('dark-mode');
+        darkModeToggle.checked = true;
+        darkModeToggleMobile.checked = true;
+    }
+
+    // Toggle dark mode
+    darkModeToggle.addEventListener('change', () => {
+        if (darkModeToggle.checked) {
+            darkModeToggleMobile.checked = true;
+            body.classList.add('dark-mode');
+            localStorage.setItem('dark-mode', 'enabled');
+        } else {
+            darkModeToggleMobile.checked = false;
+            body.classList.remove('dark-mode');
+            localStorage.setItem('dark-mode', 'disabled');
+        }
+    });
+
+    // Toggle dark mode for mobile
+    darkModeToggleMobile.addEventListener('change', () => {
+        if (darkModeToggleMobile.checked) {
+            darkModeToggle.checked = true;
+            body.classList.add('dark-mode');
+            localStorage.setItem('dark-mode', 'enabled');
+        } else {
+            darkModeToggle.checked = false;
+            body.classList.remove('dark-mode');
+            localStorage.setItem('dark-mode', 'disabled');
+        }
+    });
+
     displayUsername();
     setupEventListeners();
     setupSortEventListeners();

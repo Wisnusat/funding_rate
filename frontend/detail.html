@@ -7,11 +7,23 @@
     <link rel="stylesheet" href="/static/css/detail.css">
     <link rel="stylesheet" href="/static/css/global.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Montserrat:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <a href="/index.html" class="back-button"><img src="/assets/icon/chevron-left.png" />Back</a>
+            <div class="top-header">
+                <a href="/index.html" class="back-button"><i class="fa-solid fa-chevron-left"></i>Back</a>
+                <div class="dark-mode-toggle">
+                    <label class="switch">
+                        <input type="checkbox" id="darkModeToggle">
+                        <span class="slider round">
+                            <span class="icon sun">☀️</span>
+                            <span class="icon moon">🌙</span>
+                        </span>
+                    </label>
+                </div>
+            </div>
             <div class="crypto-info">
                 <img id="crypto-logo" src="https://cryptologos.cc/logos/bitcoin-btc-logo.png" alt="Crypto Logo" class="crypto-logo">
                 <div class="crypto-details">
