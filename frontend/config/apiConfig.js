@@ -1,4 +1,4 @@
-const baseUrl = 'https://decent-mosquito-surya-2-40873c23.koyeb.app';
+const baseUrl = 'https://48c1-125-163-131-158.ngrok-free.app';
 const coinMarketCapApiKey = 'd1b90582-1f85-4dee-8c31-2d43c234a453';
 
 export const API_CONFIG = {
