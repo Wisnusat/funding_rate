@@ -1,4 +1,4 @@
-const baseUrl = 'https://48c1-125-163-131-158.ngrok-free.app';
+const baseUrl = 'https://fe8b-2a09-bac1-34c0-28-00-da-ec.ngrok-free.app';
 const coinMarketCapApiKey = 'd1b90582-1f85-4dee-8c31-2d43c234a453';
 
 export const API_CONFIG = {
